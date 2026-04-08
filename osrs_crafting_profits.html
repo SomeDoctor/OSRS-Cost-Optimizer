@@ -184,6 +184,65 @@ tbody td { padding: 9px 12px; vertical-align: middle; }
   .stats-row { padding: 12px 14px; }
   .col-hide { display: none; }
 }
+
+/* MY STATS PANEL */
+#stats-panel {
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg3);
+}
+#stats-panel summary {
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  user-select: none;
+  list-style: none;
+}
+#stats-panel summary::after { content: ' ▼'; font-size: 10px; }
+#stats-panel[open] summary::after { content: ' ▲'; font-size: 10px; }
+.stats-inputs {
+  display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 12px 10px;
+  align-items: center;
+}
+.stats-inputs label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-dim);
+}
+.stats-inputs label span { min-width: 62px; }
+.stats-inputs input[type="number"] {
+  width: 52px; padding: 4px 6px; font-size: 12px;
+  background: var(--bg4); border: 1px solid var(--border);
+  border-radius: 3px; color: var(--text);
+}
+.stats-inputs input[type="number"]:focus { border-color: var(--gold-dim); outline: none; }
+.my-lvl-toggle { margin-left: 8px; color: var(--text); font-size: 12px; gap: 6px; }
+.my-lvl-toggle input { accent-color: var(--gold); cursor: pointer; }
+
+
+.lvl-badge {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  padding: 1px 5px; border-radius: 2px;
+  background: var(--bg4); border: 1px solid var(--border);
+  color: var(--text-dim); vertical-align: middle; margin-left: 4px;
+}
+.members-tag {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  padding: 1px 5px; border-radius: 2px; letter-spacing: 0.05em;
+  background: #1e1a2e; border: 1px solid #3a2a5a; color: #a06adb;
+  vertical-align: middle;
+}
+.f2p-tag {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  padding: 1px 5px; border-radius: 2px; letter-spacing: 0.05em;
+  background: #1a2e1e; border: 1px solid #2a5a3a; color: #5aaa6a;
+  vertical-align: middle;
+}
+
 </style>
 </head>
 <body>
@@ -207,6 +266,11 @@ tbody td { padding: 9px 12px; vertical-align: middle; }
       <option value="Cooking">Cooking</option>
       <option value="Runecraft">Runecraft</option>
     </select>
+    <select id="members-filter" onchange="render()">
+      <option value="">Members &amp; F2P</option>
+      <option value="members">Members only</option>
+      <option value="f2p">F2P only</option>
+    </select>
     <select id="profit-filter" onchange="render()">
       <option value="all">All results</option>
       <option value="pos">Profitable only</option>
@@ -214,6 +278,18 @@ tbody td { padding: 9px 12px; vertical-align: middle; }
     <div class="badge">GE tax: <span>1%</span> applied</div>
     <div class="badge">Items: <span id="count-badge">—</span></div>
   </div>
+  <details id="stats-panel">
+    <summary>My skill levels</summary>
+    <div class="stats-inputs">
+      <label><span>Herblore</span><input type="number" id="lvl-Herblore" min="1" max="99" placeholder="—" oninput="render()"></label>
+      <label><span>Fletching</span><input type="number" id="lvl-Fletching" min="1" max="99" placeholder="—" oninput="render()"></label>
+      <label><span>Smithing</span><input type="number" id="lvl-Smithing" min="1" max="99" placeholder="—" oninput="render()"></label>
+      <label><span>Crafting</span><input type="number" id="lvl-Crafting" min="1" max="99" placeholder="—" oninput="render()"></label>
+      <label><span>Cooking</span><input type="number" id="lvl-Cooking" min="1" max="99" placeholder="—" oninput="render()"></label>
+      <label><span>Runecraft</span><input type="number" id="lvl-Runecraft" min="1" max="99" placeholder="—" oninput="render()"></label>
+      <label class="my-lvl-toggle"><input type="checkbox" id="filter-my-levels" onchange="render()"> Only recipes I can make</label>
+    </div>
+  </details>
 </header>
 
 <div class="stats-row" id="stats-row" style="display:none">
@@ -250,162 +326,46 @@ tbody td { padding: 9px 12px; vertical-align: middle; }
 </div>
 
 <script>
-// ─── RECIPES ────────────────────────────────────────────────
-// Format: { name, skill, output: {id, qty}, inputs: [{id, name, qty}] }
-const RECIPES = [
-  // ── HERBLORE ──
-  { name:'Attack potion(3)',       skill:'Herblore', output:{id:121,  qty:1}, inputs:[{id:249,name:'Guam leaf',qty:1},{id:221,name:'Eye of newt',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Antipoison(3)',          skill:'Herblore', output:{id:175,  qty:1}, inputs:[{id:251,name:'Marrentill',qty:1},{id:235,name:'Unicorn horn dust',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Strength potion(3)',     skill:'Herblore', output:{id:115,  qty:1}, inputs:[{id:253,name:'Tarromin',qty:1},{id:225,name:'Limpwurt root',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Restore potion(3)',      skill:'Herblore', output:{id:127,  qty:1}, inputs:[{id:255,name:'Harralander',qty:1},{id:229,name:'Red spiders\' eggs',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Energy potion(3)',       skill:'Herblore', output:{id:3008, qty:1}, inputs:[{id:255,name:'Harralander',qty:1},{id:1973,name:'Chocolate dust',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Defence potion(3)',      skill:'Herblore', output:{id:133,  qty:1}, inputs:[{id:257,name:'Ranarr weed',qty:1},{id:239,name:'White berries',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Prayer potion(3)',       skill:'Herblore', output:{id:2434, qty:1}, inputs:[{id:257,name:'Ranarr weed',qty:1},{id:231,name:'Snape grass',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Super attack(3)',        skill:'Herblore', output:{id:145,  qty:1}, inputs:[{id:259,name:'Irit leaf',qty:1},{id:221,name:'Eye of newt',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Superantipoison(3)',     skill:'Herblore', output:{id:181,  qty:1}, inputs:[{id:259,name:'Irit leaf',qty:1},{id:235,name:'Unicorn horn dust',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Fishing potion(3)',      skill:'Herblore', output:{id:151,  qty:1}, inputs:[{id:261,name:'Avantoe',qty:1},{id:231,name:'Snape grass',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Super energy(3)',        skill:'Herblore', output:{id:3016, qty:1}, inputs:[{id:261,name:'Avantoe',qty:1},{id:2970,name:'Mort myre fungus',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Super strength(3)',      skill:'Herblore', output:{id:157,  qty:1}, inputs:[{id:263,name:'Kwuarm',qty:1},{id:225,name:'Limpwurt root',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Super restore(3)',       skill:'Herblore', output:{id:3024, qty:1}, inputs:[{id:3051,name:'Snapdragon',qty:1},{id:229,name:'Red spiders\' eggs',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Super defence(3)',       skill:'Herblore', output:{id:163,  qty:1}, inputs:[{id:265,name:'Cadantine',qty:1},{id:239,name:'White berries',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Bastion potion(3)',      skill:'Herblore', output:{id:22461,qty:1}, inputs:[{id:265,name:'Cadantine',qty:1},{id:245,name:'Wine of zamorak',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Battlemage potion(3)',   skill:'Herblore', output:{id:22449,qty:1}, inputs:[{id:265,name:'Cadantine',qty:1},{id:3138,name:'Potato cactus',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Ranging potion(3)',      skill:'Herblore', output:{id:169,  qty:1}, inputs:[{id:267,name:'Dwarf weed',qty:1},{id:245,name:'Wine of zamorak',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Magic potion(3)',        skill:'Herblore', output:{id:3040, qty:1}, inputs:[{id:2481,name:'Lantadyme',qty:1},{id:3138,name:'Potato cactus',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Antifire potion(3)',     skill:'Herblore', output:{id:2452, qty:1}, inputs:[{id:2481,name:'Lantadyme',qty:1},{id:241,name:'Dragon scale dust',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Zamorak brew(3)',        skill:'Herblore', output:{id:189,  qty:1}, inputs:[{id:269,name:'Torstol',qty:1},{id:247,name:'Jangerberries',qty:1},{id:227,name:'Vial of water',qty:1}] },
-  { name:'Saradomin brew(3)',      skill:'Herblore', output:{id:6685, qty:1}, inputs:[{id:2998,name:'Toadflax',qty:1},{id:6693,name:'Crushed nest',qty:1},{id:227,name:'Vial of water',qty:1}] },
+const RECIPES_DATA = [{"name":"Attack potion(3)","skill":"Herblore","members":true,"level":3,"output":{"id":121,"qty":1},"inputs":[{"id":249,"name":"Guam leaf","qty":1},{"id":221,"name":"Eye of newt","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Antipoison(3)","skill":"Herblore","members":true,"level":5,"output":{"id":175,"qty":1},"inputs":[{"id":251,"name":"Marrentill","qty":1},{"id":235,"name":"Unicorn horn dust","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Strength potion(3)","skill":"Herblore","members":true,"level":12,"output":{"id":115,"qty":1},"inputs":[{"id":253,"name":"Tarromin","qty":1},{"id":225,"name":"Limpwurt root","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Restore potion(3)","skill":"Herblore","members":true,"level":22,"output":{"id":127,"qty":1},"inputs":[{"id":255,"name":"Harralander","qty":1},{"id":229,"name":"Red spiders' eggs","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Energy potion(3)","skill":"Herblore","members":true,"level":26,"output":{"id":3008,"qty":1},"inputs":[{"id":255,"name":"Harralander","qty":1},{"id":1973,"name":"Chocolate dust","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Defence potion(3)","skill":"Herblore","members":true,"level":30,"output":{"id":133,"qty":1},"inputs":[{"id":257,"name":"Ranarr weed","qty":1},{"id":239,"name":"White berries","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Prayer potion(3)","skill":"Herblore","members":true,"level":38,"output":{"id":2434,"qty":1},"inputs":[{"id":257,"name":"Ranarr weed","qty":1},{"id":231,"name":"Snape grass","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Super attack(3)","skill":"Herblore","members":true,"level":45,"output":{"id":145,"qty":1},"inputs":[{"id":259,"name":"Irit leaf","qty":1},{"id":221,"name":"Eye of newt","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Superantipoison(3)","skill":"Herblore","members":true,"level":48,"output":{"id":181,"qty":1},"inputs":[{"id":259,"name":"Irit leaf","qty":1},{"id":235,"name":"Unicorn horn dust","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Fishing potion(3)","skill":"Herblore","members":true,"level":50,"output":{"id":151,"qty":1},"inputs":[{"id":261,"name":"Avantoe","qty":1},{"id":231,"name":"Snape grass","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Super energy(3)","skill":"Herblore","members":true,"level":52,"output":{"id":3016,"qty":1},"inputs":[{"id":261,"name":"Avantoe","qty":1},{"id":2970,"name":"Mort myre fungus","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Super strength(3)","skill":"Herblore","members":true,"level":55,"output":{"id":157,"qty":1},"inputs":[{"id":263,"name":"Kwuarm","qty":1},{"id":225,"name":"Limpwurt root","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Super restore(3)","skill":"Herblore","members":true,"level":63,"output":{"id":3024,"qty":1},"inputs":[{"id":3051,"name":"Snapdragon","qty":1},{"id":229,"name":"Red spiders' eggs","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Super defence(3)","skill":"Herblore","members":true,"level":66,"output":{"id":163,"qty":1},"inputs":[{"id":265,"name":"Cadantine","qty":1},{"id":239,"name":"White berries","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Antifire potion(3)","skill":"Herblore","members":true,"level":69,"output":{"id":2452,"qty":1},"inputs":[{"id":2481,"name":"Lantadyme","qty":1},{"id":241,"name":"Dragon scale dust","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Ranging potion(3)","skill":"Herblore","members":true,"level":72,"output":{"id":169,"qty":1},"inputs":[{"id":267,"name":"Dwarf weed","qty":1},{"id":245,"name":"Wine of zamorak","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Magic potion(3)","skill":"Herblore","members":true,"level":76,"output":{"id":3040,"qty":1},"inputs":[{"id":2481,"name":"Lantadyme","qty":1},{"id":3138,"name":"Potato cactus","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Zamorak brew(3)","skill":"Herblore","members":true,"level":78,"output":{"id":189,"qty":1},"inputs":[{"id":269,"name":"Torstol","qty":1},{"id":247,"name":"Jangerberries","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Bastion potion(3)","skill":"Herblore","members":true,"level":80,"output":{"id":22461,"qty":1},"inputs":[{"id":265,"name":"Cadantine","qty":1},{"id":245,"name":"Wine of zamorak","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Battlemage potion(3)","skill":"Herblore","members":true,"level":80,"output":{"id":22449,"qty":1},"inputs":[{"id":265,"name":"Cadantine","qty":1},{"id":3138,"name":"Potato cactus","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Saradomin brew(3)","skill":"Herblore","members":true,"level":81,"output":{"id":6685,"qty":1},"inputs":[{"id":2998,"name":"Toadflax","qty":1},{"id":6693,"name":"Crushed nest","qty":1},{"id":227,"name":"Vial of water","qty":1}]},{"name":"Shortbow (u)","skill":"Fletching","members":true,"level":5,"output":{"id":50,"qty":1},"inputs":[{"id":1511,"name":"Logs","qty":1}]},{"name":"Shortbow","skill":"Fletching","members":true,"level":5,"output":{"id":841,"qty":1},"inputs":[{"id":50,"name":"Shortbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Longbow (u)","skill":"Fletching","members":true,"level":10,"output":{"id":48,"qty":1},"inputs":[{"id":1511,"name":"Logs","qty":1}]},{"name":"Longbow","skill":"Fletching","members":true,"level":10,"output":{"id":839,"qty":1},"inputs":[{"id":48,"name":"Longbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Headless arrows ×15","skill":"Fletching","members":false,"level":1,"output":{"id":53,"qty":15},"inputs":[{"id":52,"name":"Arrow shafts","qty":15},{"id":314,"name":"Feathers","qty":15}]},{"name":"Bronze arrows ×15","skill":"Fletching","members":false,"level":1,"output":{"id":882,"qty":15},"inputs":[{"id":53,"name":"Headless arrows","qty":15},{"id":39,"name":"Bronze arrowtips","qty":15}]},{"name":"Oak shortbow (u)","skill":"Fletching","members":true,"level":20,"output":{"id":54,"qty":1},"inputs":[{"id":1521,"name":"Oak logs","qty":1}]},{"name":"Oak shortbow","skill":"Fletching","members":true,"level":20,"output":{"id":843,"qty":1},"inputs":[{"id":54,"name":"Oak shortbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Oak longbow (u)","skill":"Fletching","members":true,"level":25,"output":{"id":56,"qty":1},"inputs":[{"id":1521,"name":"Oak logs","qty":1}]},{"name":"Oak longbow","skill":"Fletching","members":true,"level":25,"output":{"id":845,"qty":1},"inputs":[{"id":56,"name":"Oak longbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Iron arrows ×15","skill":"Fletching","members":true,"level":15,"output":{"id":884,"qty":15},"inputs":[{"id":53,"name":"Headless arrows","qty":15},{"id":40,"name":"Iron arrowtips","qty":15}]},{"name":"Steel arrows ×15","skill":"Fletching","members":true,"level":30,"output":{"id":886,"qty":15},"inputs":[{"id":53,"name":"Headless arrows","qty":15},{"id":41,"name":"Steel arrowtips","qty":15}]},{"name":"Willow shortbow (u)","skill":"Fletching","members":true,"level":35,"output":{"id":58,"qty":1},"inputs":[{"id":1519,"name":"Willow logs","qty":1}]},{"name":"Willow shortbow","skill":"Fletching","members":true,"level":35,"output":{"id":847,"qty":1},"inputs":[{"id":58,"name":"Willow shortbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Willow longbow (u)","skill":"Fletching","members":true,"level":40,"output":{"id":60,"qty":1},"inputs":[{"id":1519,"name":"Willow logs","qty":1}]},{"name":"Willow longbow","skill":"Fletching","members":true,"level":40,"output":{"id":849,"qty":1},"inputs":[{"id":60,"name":"Willow longbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Mithril arrows ×15","skill":"Fletching","members":true,"level":45,"output":{"id":888,"qty":15},"inputs":[{"id":53,"name":"Headless arrows","qty":15},{"id":42,"name":"Mithril arrowtips","qty":15}]},{"name":"Maple shortbow (u)","skill":"Fletching","members":true,"level":50,"output":{"id":64,"qty":1},"inputs":[{"id":1517,"name":"Maple logs","qty":1}]},{"name":"Maple shortbow","skill":"Fletching","members":true,"level":50,"output":{"id":853,"qty":1},"inputs":[{"id":64,"name":"Maple shortbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Maple longbow (u)","skill":"Fletching","members":true,"level":55,"output":{"id":62,"qty":1},"inputs":[{"id":1517,"name":"Maple logs","qty":1}]},{"name":"Maple longbow","skill":"Fletching","members":true,"level":55,"output":{"id":851,"qty":1},"inputs":[{"id":62,"name":"Maple longbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Adamant arrows ×15","skill":"Fletching","members":true,"level":60,"output":{"id":890,"qty":15},"inputs":[{"id":53,"name":"Headless arrows","qty":15},{"id":43,"name":"Adamant arrowtips","qty":15}]},{"name":"Yew shortbow (u)","skill":"Fletching","members":true,"level":65,"output":{"id":68,"qty":1},"inputs":[{"id":1515,"name":"Yew logs","qty":1}]},{"name":"Yew shortbow","skill":"Fletching","members":true,"level":65,"output":{"id":857,"qty":1},"inputs":[{"id":68,"name":"Yew shortbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Yew longbow (u)","skill":"Fletching","members":true,"level":70,"output":{"id":66,"qty":1},"inputs":[{"id":1515,"name":"Yew logs","qty":1}]},{"name":"Yew longbow","skill":"Fletching","members":true,"level":70,"output":{"id":855,"qty":1},"inputs":[{"id":66,"name":"Yew longbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Rune arrows ×15","skill":"Fletching","members":true,"level":75,"output":{"id":892,"qty":15},"inputs":[{"id":53,"name":"Headless arrows","qty":15},{"id":44,"name":"Rune arrowtips","qty":15}]},{"name":"Magic shortbow (u)","skill":"Fletching","members":true,"level":80,"output":{"id":72,"qty":1},"inputs":[{"id":1513,"name":"Magic logs","qty":1}]},{"name":"Magic shortbow","skill":"Fletching","members":true,"level":80,"output":{"id":861,"qty":1},"inputs":[{"id":72,"name":"Magic shortbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Magic longbow (u)","skill":"Fletching","members":true,"level":85,"output":{"id":70,"qty":1},"inputs":[{"id":1513,"name":"Magic logs","qty":1}]},{"name":"Magic longbow","skill":"Fletching","members":true,"level":85,"output":{"id":859,"qty":1},"inputs":[{"id":70,"name":"Magic longbow (u)","qty":1},{"id":1777,"name":"Bowstring","qty":1}]},{"name":"Dragon arrows ×15","skill":"Fletching","members":true,"level":90,"output":{"id":11212,"qty":15},"inputs":[{"id":53,"name":"Headless arrows","qty":15},{"id":11237,"name":"Dragon arrowtips","qty":15}]},{"name":"Bronze bar","skill":"Smithing","members":false,"level":1,"output":{"id":2349,"qty":1},"inputs":[{"id":436,"name":"Copper ore","qty":1},{"id":438,"name":"Tin ore","qty":1}]},{"name":"Iron bar","skill":"Smithing","members":false,"level":15,"output":{"id":2351,"qty":1},"inputs":[{"id":440,"name":"Iron ore","qty":1}]},{"name":"Steel bar","skill":"Smithing","members":false,"level":30,"output":{"id":2353,"qty":1},"inputs":[{"id":440,"name":"Iron ore","qty":1},{"id":453,"name":"Coal","qty":2}]},{"name":"Gold bar","skill":"Smithing","members":false,"level":40,"output":{"id":2357,"qty":1},"inputs":[{"id":444,"name":"Gold ore","qty":1}]},{"name":"Mithril bar","skill":"Smithing","members":false,"level":50,"output":{"id":2359,"qty":1},"inputs":[{"id":447,"name":"Mithril ore","qty":1},{"id":453,"name":"Coal","qty":4}]},{"name":"Adamantite bar","skill":"Smithing","members":false,"level":70,"output":{"id":2361,"qty":1},"inputs":[{"id":449,"name":"Adamantite ore","qty":1},{"id":453,"name":"Coal","qty":6}]},{"name":"Runite bar","skill":"Smithing","members":true,"level":85,"output":{"id":2363,"qty":1},"inputs":[{"id":451,"name":"Runite ore","qty":1},{"id":453,"name":"Coal","qty":8}]},{"name":"Gold ring","skill":"Crafting","members":false,"level":5,"output":{"id":1635,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1}]},{"name":"Gold necklace","skill":"Crafting","members":false,"level":6,"output":{"id":1654,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1}]},{"name":"Gold amulet (u)","skill":"Crafting","members":false,"level":8,"output":{"id":1673,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1}]},{"name":"Gold amulet","skill":"Crafting","members":false,"level":8,"output":{"id":1692,"qty":1},"inputs":[{"id":1673,"name":"Gold amulet (u)","qty":1},{"id":1759,"name":"Ball of wool","qty":1}]},{"name":"Sapphire ring","skill":"Crafting","members":false,"level":20,"output":{"id":1637,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1623,"name":"Sapphire","qty":1}]},{"name":"Sapphire necklace","skill":"Crafting","members":false,"level":22,"output":{"id":1656,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1623,"name":"Sapphire","qty":1}]},{"name":"Sapphire amulet (u)","skill":"Crafting","members":false,"level":24,"output":{"id":1675,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1623,"name":"Sapphire","qty":1}]},{"name":"Sapphire amulet","skill":"Crafting","members":false,"level":24,"output":{"id":1694,"qty":1},"inputs":[{"id":1675,"name":"Sapphire amulet (u)","qty":1},{"id":1759,"name":"Ball of wool","qty":1}]},{"name":"Emerald ring","skill":"Crafting","members":false,"level":27,"output":{"id":1639,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1621,"name":"Emerald","qty":1}]},{"name":"Emerald necklace","skill":"Crafting","members":false,"level":29,"output":{"id":1658,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1621,"name":"Emerald","qty":1}]},{"name":"Emerald amulet (u)","skill":"Crafting","members":false,"level":31,"output":{"id":1677,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1621,"name":"Emerald","qty":1}]},{"name":"Emerald amulet","skill":"Crafting","members":false,"level":31,"output":{"id":1696,"qty":1},"inputs":[{"id":1677,"name":"Emerald amulet (u)","qty":1},{"id":1759,"name":"Ball of wool","qty":1}]},{"name":"Ruby ring","skill":"Crafting","members":false,"level":34,"output":{"id":1641,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1619,"name":"Ruby","qty":1}]},{"name":"Ruby necklace","skill":"Crafting","members":false,"level":40,"output":{"id":1660,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1619,"name":"Ruby","qty":1}]},{"name":"Diamond ring","skill":"Crafting","members":false,"level":43,"output":{"id":1643,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1617,"name":"Diamond","qty":1}]},{"name":"Ruby amulet (u)","skill":"Crafting","members":false,"level":50,"output":{"id":1679,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1619,"name":"Ruby","qty":1}]},{"name":"Ruby amulet","skill":"Crafting","members":false,"level":50,"output":{"id":1698,"qty":1},"inputs":[{"id":1679,"name":"Ruby amulet (u)","qty":1},{"id":1759,"name":"Ball of wool","qty":1}]},{"name":"Diamond necklace","skill":"Crafting","members":false,"level":56,"output":{"id":1662,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1617,"name":"Diamond","qty":1}]},{"name":"Dragonstone ring","skill":"Crafting","members":true,"level":55,"output":{"id":1645,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1615,"name":"Dragonstone","qty":1}]},{"name":"Diamond amulet (u)","skill":"Crafting","members":false,"level":70,"output":{"id":1681,"qty":1},"inputs":[{"id":2357,"name":"Gold bar","qty":1},{"id":1617,"name":"Diamond","qty":1}]},{"name":"Diamond amulet","skill":"Crafting","members":false,"level":70,"output":{"id":1700,"qty":1},"inputs":[{"id":1681,"name":"Diamond amulet (u)","qty":1},{"id":1759,"name":"Ball of wool","qty":1}]},{"name":"Shrimp","skill":"Cooking","members":false,"level":1,"output":{"id":315,"qty":1},"inputs":[{"id":317,"name":"Raw shrimp","qty":1}]},{"name":"Sardine","skill":"Cooking","members":false,"level":1,"output":{"id":325,"qty":1},"inputs":[{"id":327,"name":"Raw sardine","qty":1}]},{"name":"Herring","skill":"Cooking","members":false,"level":5,"output":{"id":347,"qty":1},"inputs":[{"id":345,"name":"Raw herring","qty":1}]},{"name":"Trout","skill":"Cooking","members":false,"level":15,"output":{"id":333,"qty":1},"inputs":[{"id":335,"name":"Raw trout","qty":1}]},{"name":"Salmon","skill":"Cooking","members":false,"level":25,"output":{"id":329,"qty":1},"inputs":[{"id":331,"name":"Raw salmon","qty":1}]},{"name":"Tuna","skill":"Cooking","members":false,"level":30,"output":{"id":361,"qty":1},"inputs":[{"id":359,"name":"Raw tuna","qty":1}]},{"name":"Karambwan","skill":"Cooking","members":true,"level":30,"output":{"id":3144,"qty":1},"inputs":[{"id":3142,"name":"Raw karambwan","qty":1}]},{"name":"Lobster","skill":"Cooking","members":false,"level":40,"output":{"id":379,"qty":1},"inputs":[{"id":377,"name":"Raw lobster","qty":1}]},{"name":"Swordfish","skill":"Cooking","members":false,"level":45,"output":{"id":373,"qty":1},"inputs":[{"id":371,"name":"Raw swordfish","qty":1}]},{"name":"Monkfish","skill":"Cooking","members":true,"level":62,"output":{"id":7946,"qty":1},"inputs":[{"id":7944,"name":"Raw monkfish","qty":1}]},{"name":"Shark","skill":"Cooking","members":true,"level":80,"output":{"id":385,"qty":1},"inputs":[{"id":383,"name":"Raw shark","qty":1}]},{"name":"Anglerfish","skill":"Cooking","members":true,"level":84,"output":{"id":13441,"qty":1},"inputs":[{"id":13439,"name":"Raw anglerfish","qty":1}]},{"name":"Dark crab","skill":"Cooking","members":true,"level":90,"output":{"id":11936,"qty":1},"inputs":[{"id":11934,"name":"Raw dark crab","qty":1}]},{"name":"Air runes ×9","skill":"Runecraft","members":false,"level":1,"output":{"id":556,"qty":9},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Mind runes ×9","skill":"Runecraft","members":false,"level":1,"output":{"id":558,"qty":9},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Water runes ×8","skill":"Runecraft","members":false,"level":5,"output":{"id":555,"qty":8},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Earth runes ×7","skill":"Runecraft","members":false,"level":9,"output":{"id":557,"qty":7},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Fire runes ×7","skill":"Runecraft","members":false,"level":14,"output":{"id":554,"qty":7},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Body runes ×8","skill":"Runecraft","members":false,"level":20,"output":{"id":559,"qty":8},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Cosmic runes ×2","skill":"Runecraft","members":true,"level":27,"output":{"id":564,"qty":2},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Chaos runes ×2","skill":"Runecraft","members":true,"level":35,"output":{"id":562,"qty":2},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Nature runes ×2","skill":"Runecraft","members":true,"level":44,"output":{"id":561,"qty":2},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Law runes","skill":"Runecraft","members":true,"level":54,"output":{"id":563,"qty":1},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Death runes","skill":"Runecraft","members":true,"level":65,"output":{"id":560,"qty":1},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Blood runes","skill":"Runecraft","members":true,"level":77,"output":{"id":565,"qty":1},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Soul runes","skill":"Runecraft","members":true,"level":90,"output":{"id":566,"qty":1},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]},{"name":"Wrath runes","skill":"Runecraft","members":true,"level":95,"output":{"id":21880,"qty":1},"inputs":[{"id":1436,"name":"Pure essence","qty":1}]}];
+</script>
+<script>
+const SKILLS = ['Herblore','Fletching','Smithing','Crafting','Cooking','Runecraft'];
 
-  // ── FLETCHING — Bows ──
-  { name:'Shortbow',          skill:'Fletching', output:{id:841, qty:1}, inputs:[{id:50,  name:'Shortbow (u)',  qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Longbow',           skill:'Fletching', output:{id:839, qty:1}, inputs:[{id:48,  name:'Longbow (u)',   qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Oak shortbow',      skill:'Fletching', output:{id:843, qty:1}, inputs:[{id:54,  name:'Oak shortbow (u)',  qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Oak longbow',       skill:'Fletching', output:{id:845, qty:1}, inputs:[{id:56,  name:'Oak longbow (u)',   qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Willow shortbow',   skill:'Fletching', output:{id:847, qty:1}, inputs:[{id:58,  name:'Willow shortbow (u)',qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Willow longbow',    skill:'Fletching', output:{id:849, qty:1}, inputs:[{id:60,  name:'Willow longbow (u)', qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Maple shortbow',    skill:'Fletching', output:{id:853, qty:1}, inputs:[{id:64,  name:'Maple shortbow (u)', qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Maple longbow',     skill:'Fletching', output:{id:851, qty:1}, inputs:[{id:62,  name:'Maple longbow (u)',  qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Yew shortbow',      skill:'Fletching', output:{id:857, qty:1}, inputs:[{id:68,  name:'Yew shortbow (u)',   qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Yew longbow',       skill:'Fletching', output:{id:855, qty:1}, inputs:[{id:66,  name:'Yew longbow (u)',    qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Magic shortbow',    skill:'Fletching', output:{id:861, qty:1}, inputs:[{id:72,  name:'Magic shortbow (u)', qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  { name:'Magic longbow',     skill:'Fletching', output:{id:859, qty:1}, inputs:[{id:70,  name:'Magic longbow (u)',  qty:1},{id:1777,name:'Bowstring',qty:1}] },
-  // Fletching — Unstrung bows from logs
-  { name:'Shortbow (u)',      skill:'Fletching', output:{id:50,  qty:1}, inputs:[{id:1511,name:'Logs',        qty:1}] },
-  { name:'Longbow (u)',       skill:'Fletching', output:{id:48,  qty:1}, inputs:[{id:1511,name:'Logs',        qty:1}] },
-  { name:'Oak shortbow (u)',  skill:'Fletching', output:{id:54,  qty:1}, inputs:[{id:1521,name:'Oak logs',    qty:1}] },
-  { name:'Oak longbow (u)',   skill:'Fletching', output:{id:56,  qty:1}, inputs:[{id:1521,name:'Oak logs',    qty:1}] },
-  { name:'Willow shortbow (u)',skill:'Fletching',output:{id:58,  qty:1}, inputs:[{id:1519,name:'Willow logs', qty:1}] },
-  { name:'Willow longbow (u)',skill:'Fletching', output:{id:60,  qty:1}, inputs:[{id:1519,name:'Willow logs', qty:1}] },
-  { name:'Maple shortbow (u)',skill:'Fletching', output:{id:64,  qty:1}, inputs:[{id:1517,name:'Maple logs',  qty:1}] },
-  { name:'Maple longbow (u)', skill:'Fletching', output:{id:62,  qty:1}, inputs:[{id:1517,name:'Maple logs',  qty:1}] },
-  { name:'Yew shortbow (u)',  skill:'Fletching', output:{id:68,  qty:1}, inputs:[{id:1515,name:'Yew logs',    qty:1}] },
-  { name:'Yew longbow (u)',   skill:'Fletching', output:{id:66,  qty:1}, inputs:[{id:1515,name:'Yew logs',    qty:1}] },
-  { name:'Magic shortbow (u)',skill:'Fletching', output:{id:72,  qty:1}, inputs:[{id:1513,name:'Magic logs',  qty:1}] },
-  { name:'Magic longbow (u)', skill:'Fletching', output:{id:70,  qty:1}, inputs:[{id:1513,name:'Magic logs',  qty:1}] },
-  // Fletching — Arrows (per 15)
-  { name:'Headless arrows ×15', skill:'Fletching', output:{id:53,qty:15}, inputs:[{id:52,name:'Arrow shafts',qty:15},{id:314,name:'Feathers',qty:15}] },
-  { name:'Bronze arrows ×15',   skill:'Fletching', output:{id:882,qty:15},inputs:[{id:53,name:'Headless arrows',qty:15},{id:39,name:'Bronze arrowtips',qty:15}] },
-  { name:'Iron arrows ×15',     skill:'Fletching', output:{id:884,qty:15},inputs:[{id:53,name:'Headless arrows',qty:15},{id:40,name:'Iron arrowtips',qty:15}] },
-  { name:'Steel arrows ×15',    skill:'Fletching', output:{id:886,qty:15},inputs:[{id:53,name:'Headless arrows',qty:15},{id:41,name:'Steel arrowtips',qty:15}] },
-  { name:'Mithril arrows ×15',  skill:'Fletching', output:{id:888,qty:15},inputs:[{id:53,name:'Headless arrows',qty:15},{id:42,name:'Mithril arrowtips',qty:15}] },
-  { name:'Adamant arrows ×15',  skill:'Fletching', output:{id:890,qty:15},inputs:[{id:53,name:'Headless arrows',qty:15},{id:43,name:'Adamant arrowtips',qty:15}] },
-  { name:'Rune arrows ×15',     skill:'Fletching', output:{id:892,qty:15},inputs:[{id:53,name:'Headless arrows',qty:15},{id:44,name:'Rune arrowtips',qty:15}] },
-  { name:'Dragon arrows ×15',   skill:'Fletching', output:{id:11212,qty:15},inputs:[{id:53,name:'Headless arrows',qty:15},{id:11237,name:'Dragon arrowtips',qty:15}] },
-
-  // ── SMITHING — Bars ──
-  { name:'Bronze bar',       skill:'Smithing', output:{id:2349,qty:1}, inputs:[{id:436,name:'Copper ore',qty:1},{id:438,name:'Tin ore',qty:1}] },
-  { name:'Iron bar',         skill:'Smithing', output:{id:2351,qty:1}, inputs:[{id:440,name:'Iron ore',qty:1}] },
-  { name:'Steel bar',        skill:'Smithing', output:{id:2353,qty:1}, inputs:[{id:440,name:'Iron ore',qty:1},{id:453,name:'Coal',qty:2}] },
-  { name:'Gold bar',         skill:'Smithing', output:{id:2357,qty:1}, inputs:[{id:444,name:'Gold ore',qty:1}] },
-  { name:'Mithril bar',      skill:'Smithing', output:{id:2359,qty:1}, inputs:[{id:447,name:'Mithril ore',qty:1},{id:453,name:'Coal',qty:4}] },
-  { name:'Adamantite bar',   skill:'Smithing', output:{id:2361,qty:1}, inputs:[{id:449,name:'Adamantite ore',qty:1},{id:453,name:'Coal',qty:6}] },
-  { name:'Runite bar',       skill:'Smithing', output:{id:2363,qty:1}, inputs:[{id:451,name:'Runite ore',qty:1},{id:453,name:'Coal',qty:8}] },
-
-  // ── CRAFTING — Jewelry ──
-  { name:'Gold ring',        skill:'Crafting', output:{id:1635,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1}] },
-  { name:'Sapphire ring',    skill:'Crafting', output:{id:1637,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1623,name:'Sapphire',qty:1}] },
-  { name:'Emerald ring',     skill:'Crafting', output:{id:1639,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1621,name:'Emerald',qty:1}] },
-  { name:'Ruby ring',        skill:'Crafting', output:{id:1641,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1619,name:'Ruby',qty:1}] },
-  { name:'Diamond ring',     skill:'Crafting', output:{id:1643,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1617,name:'Diamond',qty:1}] },
-  { name:'Dragonstone ring', skill:'Crafting', output:{id:1645,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1615,name:'Dragonstone',qty:1}] },
-  { name:'Gold necklace',    skill:'Crafting', output:{id:1654,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1}] },
-  { name:'Sapphire necklace',skill:'Crafting', output:{id:1656,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1623,name:'Sapphire',qty:1}] },
-  { name:'Emerald necklace', skill:'Crafting', output:{id:1658,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1621,name:'Emerald',qty:1}] },
-  { name:'Ruby necklace',    skill:'Crafting', output:{id:1660,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1619,name:'Ruby',qty:1}] },
-  { name:'Diamond necklace', skill:'Crafting', output:{id:1662,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1617,name:'Diamond',qty:1}] },
-  { name:'Gold amulet (u)',  skill:'Crafting', output:{id:1673,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1}] },
-  { name:'Sapphire amulet (u)',skill:'Crafting',output:{id:1675,qty:1},inputs:[{id:2357,name:'Gold bar',qty:1},{id:1623,name:'Sapphire',qty:1}] },
-  { name:'Emerald amulet (u)',skill:'Crafting', output:{id:1677,qty:1},inputs:[{id:2357,name:'Gold bar',qty:1},{id:1621,name:'Emerald',qty:1}] },
-  { name:'Ruby amulet (u)',  skill:'Crafting', output:{id:1679,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1619,name:'Ruby',qty:1}] },
-  { name:'Diamond amulet (u)',skill:'Crafting',output:{id:1681,qty:1}, inputs:[{id:2357,name:'Gold bar',qty:1},{id:1617,name:'Diamond',qty:1}] },
-  { name:'Gold amulet',      skill:'Crafting', output:{id:1692,qty:1}, inputs:[{id:1673,name:'Gold amulet (u)',qty:1},{id:1759,name:'Ball of wool',qty:1}] },
-  { name:'Sapphire amulet',  skill:'Crafting', output:{id:1694,qty:1}, inputs:[{id:1675,name:'Sapphire amulet (u)',qty:1},{id:1759,name:'Ball of wool',qty:1}] },
-  { name:'Emerald amulet',   skill:'Crafting', output:{id:1696,qty:1}, inputs:[{id:1677,name:'Emerald amulet (u)',qty:1},{id:1759,name:'Ball of wool',qty:1}] },
-  { name:'Ruby amulet',      skill:'Crafting', output:{id:1698,qty:1}, inputs:[{id:1679,name:'Ruby amulet (u)',qty:1},{id:1759,name:'Ball of wool',qty:1}] },
-  { name:'Diamond amulet',   skill:'Crafting', output:{id:1700,qty:1}, inputs:[{id:1681,name:'Diamond amulet (u)',qty:1},{id:1759,name:'Ball of wool',qty:1}] },
-
-  // ── COOKING ──
-  { name:'Shrimp',       skill:'Cooking', output:{id:315,  qty:1}, inputs:[{id:317, name:'Raw shrimp',     qty:1}] },
-  { name:'Sardine',      skill:'Cooking', output:{id:325,  qty:1}, inputs:[{id:327, name:'Raw sardine',    qty:1}] },
-  { name:'Herring',      skill:'Cooking', output:{id:347,  qty:1}, inputs:[{id:345, name:'Raw herring',    qty:1}] },
-  { name:'Trout',        skill:'Cooking', output:{id:333,  qty:1}, inputs:[{id:335, name:'Raw trout',      qty:1}] },
-  { name:'Salmon',       skill:'Cooking', output:{id:329,  qty:1}, inputs:[{id:331, name:'Raw salmon',     qty:1}] },
-  { name:'Tuna',         skill:'Cooking', output:{id:361,  qty:1}, inputs:[{id:359, name:'Raw tuna',       qty:1}] },
-  { name:'Lobster',      skill:'Cooking', output:{id:379,  qty:1}, inputs:[{id:377, name:'Raw lobster',    qty:1}] },
-  { name:'Swordfish',    skill:'Cooking', output:{id:373,  qty:1}, inputs:[{id:371, name:'Raw swordfish',  qty:1}] },
-  { name:'Monkfish',     skill:'Cooking', output:{id:7946, qty:1}, inputs:[{id:7944,name:'Raw monkfish',   qty:1}] },
-  { name:'Shark',        skill:'Cooking', output:{id:385,  qty:1}, inputs:[{id:383, name:'Raw shark',      qty:1}] },
-  { name:'Anglerfish',   skill:'Cooking', output:{id:13441,qty:1}, inputs:[{id:13439,name:'Raw anglerfish',qty:1}] },
-  { name:'Dark crab',    skill:'Cooking', output:{id:11936,qty:1}, inputs:[{id:11934,name:'Raw dark crab', qty:1}] },
-  { name:'Karambwan',    skill:'Cooking', output:{id:3144, qty:1}, inputs:[{id:3142,name:'Raw karambwan',  qty:1}] },
-
-  // ── RUNECRAFT ──
-  { name:'Air runes ×9',    skill:'Runecraft', output:{id:556, qty:9},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Water runes ×8',  skill:'Runecraft', output:{id:555, qty:8},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Earth runes ×7',  skill:'Runecraft', output:{id:557, qty:7},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Fire runes ×7',   skill:'Runecraft', output:{id:554, qty:7},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Mind runes ×9',   skill:'Runecraft', output:{id:558, qty:9},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Body runes ×8',   skill:'Runecraft', output:{id:559, qty:8},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Cosmic runes ×2', skill:'Runecraft', output:{id:564, qty:2},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Chaos runes ×2',  skill:'Runecraft', output:{id:562, qty:2},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Nature runes ×2', skill:'Runecraft', output:{id:561, qty:2},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Law runes',       skill:'Runecraft', output:{id:563, qty:1},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Death runes',     skill:'Runecraft', output:{id:560, qty:1},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Blood runes',     skill:'Runecraft', output:{id:565, qty:1},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Soul runes',      skill:'Runecraft', output:{id:566, qty:1},  inputs:[{id:1436,name:'Pure essence',qty:1}] },
-  { name:'Wrath runes',     skill:'Runecraft', output:{id:21880,qty:1}, inputs:[{id:1436,name:'Pure essence',qty:1}] },
-];
-
-// ─── STATE ──────────────────────────────────────────────────
 let prices = {};
+let RECIPES = [];
 let sortKey = 'profit';
 let sortAsc = false;
 let computed = [];
 
-// ─── FETCH PRICES ───────────────────────────────────────────
-async function loadPrices() {
+function setStatus(text, live = false) {
+  document.getElementById('dot').className = 'dot' + (live ? ' green' : '');
+  document.getElementById('status-text').textContent = text;
+}
+
+async function init() {
+  document.getElementById('tbody').innerHTML = `<tr><td colspan="5" class="loading-row">Loading…</td></tr>`;
   try {
-    const res = await fetch('https://prices.runescape.wiki/api/v1/osrs/latest');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    prices = data.data;
-    document.getElementById('dot').className = 'dot green';
-    const ts = data.timestamp
-      ? new Date(data.timestamp * 1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+    setStatus('Fetching prices…');
+    const priceRes = await fetch('https://prices.runescape.wiki/api/v1/osrs/latest');
+    if (!priceRes.ok) throw new Error(`Prices API: HTTP ${priceRes.status}`);
+    RECIPES = RECIPES_DATA;
+    const priceData = await priceRes.json();
+    prices = priceData.data;
+    const ts = priceData.timestamp
+      ? new Date(priceData.timestamp * 1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
       : 'live';
-    document.getElementById('status-text').textContent = `Prices updated ${ts}`;
+    setStatus(`Prices at ${ts} · ${RECIPES.length} recipes loaded`, true);
     computeAll();
     render();
     updateStats();
     document.getElementById('stats-row').style.display = 'grid';
   } catch(e) {
-    document.getElementById('dot').className = 'dot';
-    document.getElementById('status-text').textContent = `Failed to load prices: ${e.message}`;
-    document.getElementById('tbody').innerHTML = `<tr><td colspan="5" class="loading-row" style="color:var(--red)">Could not reach the Grand Exchange API. Check your connection.</td></tr>`;
+    setStatus(`Load failed: ${e.message}`);
+    document.getElementById('tbody').innerHTML =
+      `<tr><td colspan="5" class="loading-row" style="color:var(--red)">${e.message}</td></tr>`;
   }
 }
 
-// ─── COMPUTE ────────────────────────────────────────────────
 function getPrice(id, type) {
   const p = prices[id];
   if (!p) return null;
@@ -422,40 +382,41 @@ function computeAll() {
     }
     const outLow = getPrice(r.output.id, 'sell');
     let revenue = null, profit = null;
-    if (outLow != null && r.output.qty != null) {
+    if (outLow != null) {
       revenue = outLow * r.output.qty;
-      // Apply 1% GE tax (capped at 5,000,000 gp)
       const tax = Math.min(Math.floor(revenue * 0.01), 5000000);
-      revenue = revenue - tax;
+      revenue -= tax;
     }
     if (costOk && revenue != null) profit = Math.round(revenue - cost);
     return { ...r, cost: costOk ? Math.round(cost) : null, revenue: revenue != null ? Math.round(revenue) : null, profit };
   });
 }
 
-// ─── RENDER ─────────────────────────────────────────────────
-function fmt(n) {
-  if (n == null) return '—';
-  const abs = Math.abs(n);
-  let s;
-  if (abs >= 1e9) s = (n/1e9).toFixed(2)+'b';
-  else if (abs >= 1e6) s = (n/1e6).toFixed(2)+'m';
-  else if (abs >= 1e3) s = (n/1e3).toFixed(1)+'k';
-  else s = n.toLocaleString();
-  return s;
+function getMyLevel(skill) {
+  const el = document.getElementById('lvl-' + skill);
+  const v = el ? parseInt(el.value) : NaN;
+  return isNaN(v) ? null : Math.min(99, Math.max(1, v));
 }
 
 function render() {
-  const q = document.getElementById('search').value.toLowerCase();
-  const skillF = document.getElementById('skill-filter').value;
-  const profitF = document.getElementById('profit-filter').value;
+  const q        = document.getElementById('search').value.toLowerCase();
+  const skillF   = document.getElementById('skill-filter').value;
+  const membersF = document.getElementById('members-filter').value;
+  const profitF  = document.getElementById('profit-filter').value;
+  const myLvlOn  = document.getElementById('filter-my-levels')?.checked;
 
   let rows = computed.filter(r => {
     if (skillF && r.skill !== skillF) return false;
+    if (membersF === 'members' && !r.members) return false;
+    if (membersF === 'f2p' && r.members) return false;
     if (profitF === 'pos' && (r.profit == null || r.profit <= 0)) return false;
+    if (myLvlOn) {
+      const myLvl = getMyLevel(r.skill);
+      if (myLvl !== null && r.level > myLvl) return false;
+    }
     if (q) {
-      const haystack = r.name.toLowerCase() + ' ' + r.inputs.map(i=>i.name).join(' ').toLowerCase();
-      if (!haystack.includes(q)) return false;
+      const hay = r.name.toLowerCase() + ' ' + r.inputs.map(i => i.name).join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
     }
     return true;
   });
@@ -470,9 +431,8 @@ function render() {
 
   document.getElementById('count-badge').textContent = rows.length;
 
-  // Arrow indicators
   ['name','skill','cost','revenue','profit'].forEach(k => {
-    const el = document.getElementById('arr-'+k);
+    const el = document.getElementById('arr-' + k);
     if (!el) return;
     el.textContent = sortKey === k ? (sortAsc ? '▲' : '▼') : '';
     el.className = 'arr' + (sortKey === k ? ' active' : '');
@@ -485,11 +445,11 @@ function render() {
     return;
   }
 
-  // Find max profit for bar scaling
-  const maxProfit = Math.max(...rows.filter(r=>r.profit!=null).map(r=>Math.abs(r.profit)), 1);
+  const maxProfit = Math.max(...rows.filter(r => r.profit != null).map(r => Math.abs(r.profit)), 1);
 
   const html = rows.map(r => {
-    const inputStr = r.inputs.map(i => `${i.qty > 1 ? i.qty+'× ' : ''}${i.name}`).join(', ');
+    const inputStr = r.inputs.map(i => `${i.qty > 1 ? i.qty + '× ' : ''}${i.name}`).join(', ');
+    const lvlTag = r.level ? `<span class="lvl-badge">Lv.${r.level}</span>` : '';
     let profitHtml;
     if (r.profit == null) {
       profitHtml = `<span class="profit-value profit-zero">No data</span>`;
@@ -500,14 +460,17 @@ function render() {
     } else {
       profitHtml = `<span class="profit-value profit-neg">${fmt(r.profit)}<span class="gp">gp</span></span>`;
     }
+    const membersTag = r.members
+      ? `<span class="members-tag">P2P</span>`
+      : `<span class="f2p-tag">F2P</span>`;
     return `<tr>
       <td>
-        <div class="item-name">${r.name}</div>
+        <div class="item-name">${r.name} ${lvlTag}</div>
         <div class="item-inputs">${inputStr}</div>
       </td>
-      <td><span class="skill-badge skill-${r.skill}">${r.skill}</span></td>
-      <td class="price-cell col-hide">${r.cost != null ? fmt(r.cost)+'<span class="gp">gp</span>' : '—'}</td>
-      <td class="price-cell col-hide">${r.revenue != null ? fmt(r.revenue)+'<span class="gp">gp</span>' : '—'}</td>
+      <td><span class="skill-badge skill-${r.skill}">${r.skill}</span> ${membersTag}</td>
+      <td class="price-cell col-hide">${r.cost != null ? fmt(r.cost) + '<span class="gp">gp</span>' : '—'}</td>
+      <td class="price-cell col-hide">${r.revenue != null ? fmt(r.revenue) + '<span class="gp">gp</span>' : '—'}</td>
       <td class="profit-cell">${profitHtml}</td>
     </tr>`;
   }).join('');
@@ -515,12 +478,21 @@ function render() {
   document.getElementById('tbody').innerHTML = html;
 }
 
+function fmt(n) {
+  if (n == null) return '—';
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return (n/1e9).toFixed(2) + 'b';
+  if (abs >= 1e6) return (n/1e6).toFixed(2) + 'm';
+  if (abs >= 1e3) return (n/1e3).toFixed(1) + 'k';
+  return n.toLocaleString();
+}
+
 function updateStats() {
   const profitable = computed.filter(r => r.profit != null && r.profit > 0);
   document.getElementById('s-recipes').textContent = computed.length;
   document.getElementById('s-profitable').textContent = profitable.length;
   if (profitable.length) {
-    const best = profitable.reduce((a,b) => a.profit > b.profit ? a : b);
+    const best = profitable.reduce((a, b) => a.profit > b.profit ? a : b);
     document.getElementById('s-best').textContent = fmt(best.profit) + ' gp';
     document.getElementById('s-bestname').textContent = best.name;
   }
@@ -532,7 +504,7 @@ function setSort(key) {
   render();
 }
 
-loadPrices();
+init();
 </script>
 </body>
 </html>
