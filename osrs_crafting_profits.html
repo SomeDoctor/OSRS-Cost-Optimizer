@@ -222,6 +222,14 @@ tbody td { padding: 9px 12px; vertical-align: middle; }
 .stats-inputs input[type="number"]:focus { border-color: var(--gold-dim); outline: none; }
 .my-lvl-toggle { margin-left: 8px; color: var(--text); font-size: 12px; gap: 6px; }
 .my-lvl-toggle input { accent-color: var(--gold); cursor: pointer; }
+#refresh-btn {
+  padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;
+  background: var(--bg3); border: 1px solid var(--border-bright);
+  color: var(--gold); cursor: pointer; font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+#refresh-btn:hover { background: var(--bg4); border-color: var(--gold-dim); }
+#refresh-btn:disabled { opacity: 0.5; cursor: default; }
 
 
 .lvl-badge {
@@ -277,6 +285,7 @@ tbody td { padding: 9px 12px; vertical-align: middle; }
     </select>
     <div class="badge">GE tax: <span>1%</span> applied</div>
     <div class="badge">Items: <span id="count-badge">—</span></div>
+    <button id="refresh-btn" onclick="refreshPrices()">↻ Refresh prices</button>
   </div>
   <details id="stats-panel">
     <summary>My skill levels</summary>
@@ -336,6 +345,31 @@ let RECIPES = [];
 let sortKey = 'profit';
 let sortAsc = false;
 let computed = [];
+
+async function refreshPrices() {
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = true;
+  btn.textContent = '↻ Refreshing…';
+  try {
+    setStatus('Fetching prices…');
+    const priceRes = await fetch('https://prices.runescape.wiki/api/v1/osrs/latest');
+    if (!priceRes.ok) throw new Error(`Prices API: HTTP ${priceRes.status}`);
+    const priceData = await priceRes.json();
+    prices = priceData.data;
+    const ts = priceData.timestamp
+      ? new Date(priceData.timestamp * 1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+      : 'live';
+    setStatus(`Prices at ${ts} · ${RECIPES.length} recipes loaded`, true);
+    computeAll();
+    render();
+    updateStats();
+  } catch(e) {
+    setStatus(`Refresh failed: ${e.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '↻ Refresh prices';
+  }
+}
 
 function setStatus(text, live = false) {
   document.getElementById('dot').className = 'dot' + (live ? ' green' : '');
