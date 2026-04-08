@@ -290,6 +290,10 @@ tbody td { padding: 9px 12px; vertical-align: middle; }
   <details id="stats-panel">
     <summary>My skill levels</summary>
     <div class="stats-inputs">
+      <label><span>RSN</span><input type="text" id="rsn-input" placeholder="Player name…" style="width:130px;padding:4px 6px;font-size:12px;background:var(--bg4);border:1px solid var(--border);border-radius:3px;color:var(--text)"></label>
+      <button id="rsn-btn" onclick="lookupPlayer()" style="padding:4px 10px;border-radius:3px;font-size:11px;font-weight:600;background:var(--bg3);border:1px solid var(--border-bright);color:var(--gold);cursor:pointer;font-family:inherit">Lookup</button>
+      <span id="rsn-status" style="font-size:11px;color:var(--text-dim)"></span>
+      <span style="color:var(--border);margin:0 4px">│</span>
       <label><span>Herblore</span><input type="number" id="lvl-Herblore" min="1" max="99" placeholder="—" oninput="render()"></label>
       <label><span>Fletching</span><input type="number" id="lvl-Fletching" min="1" max="99" placeholder="—" oninput="render()"></label>
       <label><span>Smithing</span><input type="number" id="lvl-Smithing" min="1" max="99" placeholder="—" oninput="render()"></label>
@@ -7034,6 +7038,53 @@ function setSort(key) {
   else { sortKey = key; sortAsc = key === 'name' || key === 'skill'; }
   render();
 }
+
+async function lookupPlayer() {
+  const rsn = document.getElementById('rsn-input').value.trim();
+  if (!rsn) return;
+  const btn = document.getElementById('rsn-btn');
+  const status = document.getElementById('rsn-status');
+  btn.disabled = true; btn.textContent = '…';
+  status.textContent = '';
+  try {
+    const hiscoreUrl = `https://secure.runescape.com/m=hiscore_oldschool/index_lite.json?player=${encodeURIComponent(rsn)}`;
+    const proxies = [
+      url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+      url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+    ];
+    let res, lastErr;
+    for (const proxy of proxies) {
+      try {
+        res = await fetch(proxy(hiscoreUrl));
+        if (res.ok) break;
+        res = null;
+      } catch(e) { lastErr = e; res = null; }
+    }
+    if (!res || !res.ok) throw new Error(lastErr?.message || 'All proxies failed — try again later');
+    const data = await res.json();
+    // The JSON returns skills array; map skill names to our inputs
+    const skillMap = {Herblore:'Herblore',Fletching:'Fletching',Smithing:'Smithing',Crafting:'Crafting',Cooking:'Cooking',Runecraft:'Runecraft',Runecrafting:'Runecraft'};
+    let found = 0;
+    for (const s of (data.skills || [])) {
+      const mapped = skillMap[s.name];
+      if (mapped) {
+        const el = document.getElementById('lvl-' + mapped);
+        if (el) { el.value = s.level; found++; }
+      }
+    }
+    status.style.color = 'var(--green)';
+    status.textContent = `✓ ${rsn} — ${found} skills loaded`;
+    render();
+  } catch(e) {
+    status.style.color = 'var(--red)';
+    status.textContent = `✗ ${e.message}`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Lookup';
+  }
+}
+
+document.getElementById('rsn-input').addEventListener('keydown', e => { if (e.key === 'Enter') lookupPlayer(); });
 
 init();
 </script>
