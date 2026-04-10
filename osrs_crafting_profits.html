@@ -310,6 +310,7 @@ tbody td { padding: 9px 12px; vertical-align: middle; }
   <div class="stat"><div class="stat-label">Profitable recipes</div><div class="stat-value green" id="s-profitable">—</div></div>
   <div class="stat"><div class="stat-label">Best profit/item</div><div class="stat-value green" id="s-best">—</div></div>
   <div class="stat"><div class="stat-label">Best recipe</div><div class="stat-value" id="s-bestname" style="font-size:13px">—</div></div>
+  <div class="stat"><div class="stat-label">Best GP/XP</div><div class="stat-value green" id="s-bestgpxp">—</div></div>
 </div>
 
 <div class="table-wrap">
@@ -325,17 +326,19 @@ tbody td { padding: 9px 12px; vertical-align: middle; }
         <th onclick="setSort('cost')" class="price-cell col-hide">Cost <span class="arr" id="arr-cost"></span></th>
         <th onclick="setSort('revenue')" class="price-cell col-hide">Revenue <span class="arr" id="arr-revenue"></span></th>
         <th onclick="setSort('profit')" class="profit-cell active">Profit <span class="arr active" id="arr-profit">▼</span></th>
+        <th onclick="setSort('xp')" class="price-cell col-hide">XP <span class="arr" id="arr-xp"></span></th>
+        <th onclick="setSort('gpPerXp')" class="price-cell">GP/XP <span class="arr" id="arr-gpPerXp"></span></th>
       </tr>
     </thead>
     <tbody id="tbody">
-      <tr><td colspan="5" class="loading-row">Fetching Grand Exchange prices…</td></tr>
+      <tr><td colspan="7" class="loading-row">Fetching Grand Exchange prices…</td></tr>
     </tbody>
   </table>
 </div>
 
 <div class="note">
   <strong>How profit is calculated:</strong> Cost = sum of ingredient buy prices (GE high price). Revenue = output sell price × 0.99 (1% GE tax, capped at 5M gp). Profit = Revenue − Cost.
-  Prices refresh on page load. Actual margins may vary — always verify in-game before buying in bulk.
+  GP/XP shows profit (or cost) per experience point gained. Prices refresh on page load. Actual margins may vary — always verify in-game before buying in bulk.
 </div>
 
 <script>
@@ -360,7 +363,8 @@ const RECIPES_DATA = [
         "name": "Eye of newt",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Antipoison(3)",
@@ -382,7 +386,8 @@ const RECIPES_DATA = [
         "name": "Unicorn horn dust",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Strength potion(3)",
@@ -404,7 +409,8 @@ const RECIPES_DATA = [
         "name": "Limpwurt root",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Restore potion(3)",
@@ -426,7 +432,8 @@ const RECIPES_DATA = [
         "name": "Red spiders' eggs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Energy potion(3)",
@@ -448,7 +455,8 @@ const RECIPES_DATA = [
         "name": "Chocolate dust",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 67.5
   },
   {
     "name": "Defence potion(3)",
@@ -470,7 +478,8 @@ const RECIPES_DATA = [
         "name": "White berries",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Prayer potion(3)",
@@ -492,7 +501,8 @@ const RECIPES_DATA = [
         "name": "Snape grass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 87.5
   },
   {
     "name": "Super attack(3)",
@@ -514,7 +524,8 @@ const RECIPES_DATA = [
         "name": "Eye of newt",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Superantipoison(3)",
@@ -536,7 +547,8 @@ const RECIPES_DATA = [
         "name": "Unicorn horn dust",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 106.3
   },
   {
     "name": "Fishing potion(3)",
@@ -558,7 +570,8 @@ const RECIPES_DATA = [
         "name": "Snape grass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 112.5
   },
   {
     "name": "Super energy(3)",
@@ -580,7 +593,8 @@ const RECIPES_DATA = [
         "name": "Mort myre fungus",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 117.5
   },
   {
     "name": "Super strength(3)",
@@ -602,7 +616,8 @@ const RECIPES_DATA = [
         "name": "Limpwurt root",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 125
   },
   {
     "name": "Super restore(3)",
@@ -624,7 +639,8 @@ const RECIPES_DATA = [
         "name": "Red spiders' eggs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 142.5
   },
   {
     "name": "Super defence(3)",
@@ -646,7 +662,8 @@ const RECIPES_DATA = [
         "name": "White berries",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Antifire potion(3)",
@@ -668,7 +685,8 @@ const RECIPES_DATA = [
         "name": "Dragon scale dust",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 157.5
   },
   {
     "name": "Ranging potion(3)",
@@ -690,7 +708,8 @@ const RECIPES_DATA = [
         "name": "Wine of zamorak",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 162.5
   },
   {
     "name": "Magic potion(3)",
@@ -712,7 +731,8 @@ const RECIPES_DATA = [
         "name": "Potato cactus",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 172.5
   },
   {
     "name": "Zamorak brew(3)",
@@ -734,7 +754,8 @@ const RECIPES_DATA = [
         "name": "Jangerberries",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 175
   },
   {
     "name": "Bastion potion(3)",
@@ -756,7 +777,8 @@ const RECIPES_DATA = [
         "name": "Wine of zamorak",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 155
   },
   {
     "name": "Battlemage potion(3)",
@@ -778,7 +800,8 @@ const RECIPES_DATA = [
         "name": "Potato cactus",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 155
   },
   {
     "name": "Saradomin brew(3)",
@@ -800,7 +823,8 @@ const RECIPES_DATA = [
         "name": "Crushed nest",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 180
   },
   {
     "name": "Headless arrows \u00d715",
@@ -822,7 +846,8 @@ const RECIPES_DATA = [
         "name": "Feather",
         "qty": 15
       }
-    ]
+    ],
+    "xp": 15
   },
   {
     "name": "Bronze arrows \u00d715",
@@ -844,7 +869,8 @@ const RECIPES_DATA = [
         "name": "Bronze arrowtips",
         "qty": 15
       }
-    ]
+    ],
+    "xp": 19.5
   },
   {
     "name": "Shortbow (u)",
@@ -861,7 +887,8 @@ const RECIPES_DATA = [
         "name": "Logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 5
   },
   {
     "name": "Shortbow",
@@ -883,7 +910,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 5
   },
   {
     "name": "Longbow (u)",
@@ -900,7 +928,8 @@ const RECIPES_DATA = [
         "name": "Logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 10
   },
   {
     "name": "Longbow",
@@ -922,7 +951,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 10
   },
   {
     "name": "Iron arrows \u00d715",
@@ -944,7 +974,8 @@ const RECIPES_DATA = [
         "name": "Iron arrowtips",
         "qty": 15
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Oak shortbow (u)",
@@ -961,7 +992,8 @@ const RECIPES_DATA = [
         "name": "Oak logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 16.5
   },
   {
     "name": "Oak shortbow",
@@ -983,7 +1015,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 16.5
   },
   {
     "name": "Oak longbow (u)",
@@ -1000,7 +1033,8 @@ const RECIPES_DATA = [
         "name": "Oak logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Oak longbow",
@@ -1022,7 +1056,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Steel arrows \u00d715",
@@ -1044,7 +1079,8 @@ const RECIPES_DATA = [
         "name": "Steel arrowtips",
         "qty": 15
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Willow shortbow (u)",
@@ -1061,7 +1097,8 @@ const RECIPES_DATA = [
         "name": "Willow logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 33.3
   },
   {
     "name": "Willow shortbow",
@@ -1083,7 +1120,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 33.3
   },
   {
     "name": "Willow longbow (u)",
@@ -1100,7 +1138,8 @@ const RECIPES_DATA = [
         "name": "Willow logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 41.5
   },
   {
     "name": "Willow longbow",
@@ -1122,7 +1161,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 41.5
   },
   {
     "name": "Mithril arrows \u00d715",
@@ -1144,7 +1184,8 @@ const RECIPES_DATA = [
         "name": "Mithril arrowtips",
         "qty": 15
       }
-    ]
+    ],
+    "xp": 112.5
   },
   {
     "name": "Maple shortbow (u)",
@@ -1161,7 +1202,8 @@ const RECIPES_DATA = [
         "name": "Maple logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Maple shortbow",
@@ -1183,7 +1225,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Maple longbow (u)",
@@ -1200,7 +1243,8 @@ const RECIPES_DATA = [
         "name": "Maple logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 58.3
   },
   {
     "name": "Maple longbow",
@@ -1222,7 +1266,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 58.3
   },
   {
     "name": "Adamant arrows \u00d715",
@@ -1244,7 +1289,8 @@ const RECIPES_DATA = [
         "name": "Adamant arrowtips",
         "qty": 15
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Yew shortbow (u)",
@@ -1261,7 +1307,8 @@ const RECIPES_DATA = [
         "name": "Yew logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 67.5
   },
   {
     "name": "Yew shortbow",
@@ -1283,7 +1330,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 67.5
   },
   {
     "name": "Yew longbow (u)",
@@ -1300,7 +1348,8 @@ const RECIPES_DATA = [
         "name": "Yew logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Yew longbow",
@@ -1322,7 +1371,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune arrows \u00d715",
@@ -1344,7 +1394,8 @@ const RECIPES_DATA = [
         "name": "Rune arrowtips",
         "qty": 15
       }
-    ]
+    ],
+    "xp": 187.5
   },
   {
     "name": "Magic shortbow (u)",
@@ -1361,7 +1412,8 @@ const RECIPES_DATA = [
         "name": "Magic logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 83.3
   },
   {
     "name": "Magic shortbow",
@@ -1383,7 +1435,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 83.3
   },
   {
     "name": "Magic longbow (u)",
@@ -1400,7 +1453,8 @@ const RECIPES_DATA = [
         "name": "Magic logs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 91.5
   },
   {
     "name": "Magic longbow",
@@ -1422,7 +1476,8 @@ const RECIPES_DATA = [
         "name": "Bowstring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 91.5
   },
   {
     "name": "Dragon arrows \u00d715",
@@ -1444,7 +1499,8 @@ const RECIPES_DATA = [
         "name": "Dragon arrowtips",
         "qty": 15
       }
-    ]
+    ],
+    "xp": 240
   },
   {
     "name": "Bronze bar",
@@ -1466,7 +1522,8 @@ const RECIPES_DATA = [
         "name": "Tin ore",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 6.2
   },
   {
     "name": "Iron bar",
@@ -1483,7 +1540,8 @@ const RECIPES_DATA = [
         "name": "Iron ore",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Silver bar",
@@ -1500,7 +1558,8 @@ const RECIPES_DATA = [
         "name": "Silver ore",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 13.7
   },
   {
     "name": "Steel bar",
@@ -1522,7 +1581,8 @@ const RECIPES_DATA = [
         "name": "Coal",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 17.5
   },
   {
     "name": "Gold bar",
@@ -1539,7 +1599,8 @@ const RECIPES_DATA = [
         "name": "Gold ore",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 22.5
   },
   {
     "name": "Mithril bar",
@@ -1561,7 +1622,8 @@ const RECIPES_DATA = [
         "name": "Coal",
         "qty": 4
       }
-    ]
+    ],
+    "xp": 30
   },
   {
     "name": "Adamantite bar",
@@ -1583,7 +1645,8 @@ const RECIPES_DATA = [
         "name": "Coal",
         "qty": 6
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Runite bar",
@@ -1605,7 +1668,8 @@ const RECIPES_DATA = [
         "name": "Coal",
         "qty": 8
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Bronze dagger",
@@ -1622,7 +1686,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze axe",
@@ -1639,7 +1704,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze mace",
@@ -1656,7 +1722,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze med helm",
@@ -1673,7 +1740,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze bolts (unf) \u00d710",
@@ -1690,7 +1758,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze sword",
@@ -1707,7 +1776,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze dart tips \u00d710",
@@ -1724,7 +1794,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze wire",
@@ -1741,7 +1812,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze nails \u00d715",
@@ -1758,7 +1830,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze scimitar",
@@ -1775,7 +1848,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 25.0
   },
   {
     "name": "Bronze spear",
@@ -1792,7 +1866,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze hasta",
@@ -1809,7 +1884,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze arrowtips \u00d715",
@@ -1826,7 +1902,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze crossbow limbs",
@@ -1843,7 +1920,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze longsword",
@@ -1860,7 +1938,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 25.0
   },
   {
     "name": "Bronze javelin heads \u00d75",
@@ -1877,7 +1956,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze full helm",
@@ -1894,7 +1974,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 25.0
   },
   {
     "name": "Bronze throwing knives \u00d75",
@@ -1911,7 +1992,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 12.5
   },
   {
     "name": "Bronze sq shield",
@@ -1928,7 +2010,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 25.0
   },
   {
     "name": "Bronze warhammer",
@@ -1945,7 +2028,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Bronze battleaxe",
@@ -1962,7 +2046,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Bronze chainbody",
@@ -1979,7 +2064,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Bronze kiteshield",
@@ -1996,7 +2082,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Bronze claws",
@@ -2013,7 +2100,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 25.0
   },
   {
     "name": "Bronze 2h sword",
@@ -2030,7 +2118,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Bronze platelegs",
@@ -2047,7 +2136,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Bronze plateskirt",
@@ -2064,7 +2154,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Bronze platebody",
@@ -2081,7 +2172,8 @@ const RECIPES_DATA = [
         "name": "Bronze bar",
         "qty": 5
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Iron dagger",
@@ -2098,7 +2190,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron axe",
@@ -2115,7 +2208,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron mace",
@@ -2132,7 +2226,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron med helm",
@@ -2149,7 +2244,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron bolts (unf) \u00d710",
@@ -2166,7 +2262,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron sword",
@@ -2183,7 +2280,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron dart tips \u00d710",
@@ -2200,7 +2298,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron nails \u00d715",
@@ -2217,7 +2316,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron scimitar",
@@ -2234,7 +2334,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Iron spear",
@@ -2251,7 +2352,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron hasta",
@@ -2268,7 +2370,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron arrowtips \u00d715",
@@ -2285,7 +2388,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron crossbow limbs",
@@ -2302,7 +2406,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron longsword",
@@ -2319,7 +2424,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Iron javelin heads \u00d75",
@@ -2336,7 +2442,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron full helm",
@@ -2353,7 +2460,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Iron throwing knives \u00d75",
@@ -2370,7 +2478,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron sq shield",
@@ -2387,7 +2496,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Iron studs",
@@ -2404,7 +2514,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Iron warhammer",
@@ -2421,7 +2532,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Iron battleaxe",
@@ -2438,7 +2550,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Iron chainbody",
@@ -2455,7 +2568,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Iron kiteshield",
@@ -2472,7 +2586,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Iron claws",
@@ -2489,7 +2604,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Iron 2h sword",
@@ -2506,7 +2622,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Iron platelegs",
@@ -2523,7 +2640,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Iron plateskirt",
@@ -2540,7 +2658,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Iron platebody",
@@ -2557,7 +2676,8 @@ const RECIPES_DATA = [
         "name": "Iron bar",
         "qty": 5
       }
-    ]
+    ],
+    "xp": 125
   },
   {
     "name": "Steel dagger",
@@ -2574,7 +2694,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel axe",
@@ -2591,7 +2712,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel mace",
@@ -2608,7 +2730,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel med helm",
@@ -2625,7 +2748,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel bolts (unf) \u00d710",
@@ -2642,7 +2766,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel sword",
@@ -2659,7 +2784,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel nails \u00d715",
@@ -2676,7 +2802,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel dart tips \u00d710",
@@ -2693,7 +2820,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel scimitar",
@@ -2710,7 +2838,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 75.0
   },
   {
     "name": "Steel spear",
@@ -2727,7 +2856,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel hasta",
@@ -2744,7 +2874,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel arrowtips \u00d715",
@@ -2761,7 +2892,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Cannonball \u00d74",
@@ -2778,7 +2910,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25.6
   },
   {
     "name": "Steel crossbow limbs",
@@ -2795,7 +2928,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel longsword",
@@ -2812,7 +2946,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 75.0
   },
   {
     "name": "Steel javelin heads \u00d75",
@@ -2829,7 +2964,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel studs",
@@ -2846,7 +2982,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel full helm",
@@ -2863,7 +3000,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 75.0
   },
   {
     "name": "Steel throwing knives \u00d75",
@@ -2880,7 +3018,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Steel sq shield",
@@ -2897,7 +3036,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 75.0
   },
   {
     "name": "Steel warhammer",
@@ -2914,7 +3054,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 112.5
   },
   {
     "name": "Steel battleaxe",
@@ -2931,7 +3072,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 112.5
   },
   {
     "name": "Steel chainbody",
@@ -2948,7 +3090,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 112.5
   },
   {
     "name": "Steel kiteshield",
@@ -2965,7 +3108,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 112.5
   },
   {
     "name": "Steel claws",
@@ -2982,7 +3126,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 75.0
   },
   {
     "name": "Steel 2h sword",
@@ -2999,7 +3144,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 112.5
   },
   {
     "name": "Steel platelegs",
@@ -3016,7 +3162,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 112.5
   },
   {
     "name": "Steel plateskirt",
@@ -3033,7 +3180,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 112.5
   },
   {
     "name": "Steel platebody",
@@ -3050,7 +3198,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 5
       }
-    ]
+    ],
+    "xp": 187.5
   },
   {
     "name": "Steel bullseye lantern (unf)",
@@ -3067,7 +3216,8 @@ const RECIPES_DATA = [
         "name": "Steel bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37.5
   },
   {
     "name": "Mithril dagger",
@@ -3084,7 +3234,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril axe",
@@ -3101,7 +3252,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril mace",
@@ -3118,7 +3270,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril med helm",
@@ -3135,7 +3288,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril bolts (unf) \u00d710",
@@ -3152,7 +3306,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril sword",
@@ -3169,7 +3324,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril nails \u00d715",
@@ -3186,7 +3342,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril dart tips \u00d710",
@@ -3203,7 +3360,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril scimitar",
@@ -3220,7 +3378,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Mithril spear",
@@ -3237,7 +3396,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril hasta",
@@ -3254,7 +3414,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril arrowtips \u00d715",
@@ -3271,7 +3432,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril crossbow limbs",
@@ -3288,7 +3450,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril longsword",
@@ -3305,7 +3468,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Mithril javelin heads \u00d75",
@@ -3322,7 +3486,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril full helm",
@@ -3339,7 +3504,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Mithril throwing knives \u00d75",
@@ -3356,7 +3522,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mithril sq shield",
@@ -3373,7 +3540,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Mithril warhammer",
@@ -3390,7 +3558,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Mithril battleaxe",
@@ -3407,7 +3576,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Mithril chainbody",
@@ -3424,7 +3594,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Mithril kiteshield",
@@ -3441,7 +3612,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Mithril claws",
@@ -3458,7 +3630,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Mithril 2h sword",
@@ -3475,7 +3648,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Mithril platelegs",
@@ -3492,7 +3666,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Mithril plateskirt",
@@ -3509,7 +3684,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Mithril platebody",
@@ -3526,7 +3702,8 @@ const RECIPES_DATA = [
         "name": "Mithril bar",
         "qty": 5
       }
-    ]
+    ],
+    "xp": 250
   },
   {
     "name": "Adamant dagger",
@@ -3543,7 +3720,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant axe",
@@ -3560,7 +3738,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant mace",
@@ -3577,7 +3756,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant med helm",
@@ -3594,7 +3774,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant bolts (unf) \u00d710",
@@ -3611,7 +3792,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant sword",
@@ -3628,7 +3810,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant nails \u00d715",
@@ -3645,7 +3828,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant dart tips \u00d710",
@@ -3662,7 +3846,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant scimitar",
@@ -3679,7 +3864,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 125.0
   },
   {
     "name": "Adamant spear",
@@ -3696,7 +3882,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant hasta",
@@ -3713,7 +3900,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant arrowtips \u00d715",
@@ -3730,7 +3918,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant crossbow limbs",
@@ -3747,7 +3936,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant longsword",
@@ -3764,7 +3954,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 125.0
   },
   {
     "name": "Adamant javelin heads \u00d75",
@@ -3781,7 +3972,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant full helm",
@@ -3798,7 +3990,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 125.0
   },
   {
     "name": "Adamant throwing knives \u00d75",
@@ -3815,7 +4008,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62.5
   },
   {
     "name": "Adamant sq shield",
@@ -3832,7 +4026,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 125.0
   },
   {
     "name": "Adamant warhammer",
@@ -3849,7 +4044,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 187.5
   },
   {
     "name": "Adamant battleaxe",
@@ -3866,7 +4062,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 187.5
   },
   {
     "name": "Adamant chainbody",
@@ -3883,7 +4080,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 187.5
   },
   {
     "name": "Adamant kiteshield",
@@ -3900,7 +4098,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 187.5
   },
   {
     "name": "Adamant claws",
@@ -3917,7 +4116,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 125.0
   },
   {
     "name": "Adamant 2h sword",
@@ -3934,7 +4134,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 187.5
   },
   {
     "name": "Adamant platelegs",
@@ -3951,7 +4152,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 187.5
   },
   {
     "name": "Adamant plateskirt",
@@ -3968,7 +4170,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 187.5
   },
   {
     "name": "Adamant platebody",
@@ -3985,7 +4188,8 @@ const RECIPES_DATA = [
         "name": "Adamantite bar",
         "qty": 5
       }
-    ]
+    ],
+    "xp": 312.5
   },
   {
     "name": "Rune dagger",
@@ -4002,7 +4206,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune axe",
@@ -4019,7 +4224,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune mace",
@@ -4036,7 +4242,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune med helm",
@@ -4053,7 +4260,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune bolts (unf) \u00d710",
@@ -4070,7 +4278,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune sword",
@@ -4087,7 +4296,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune nails \u00d715",
@@ -4104,7 +4314,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune dart tips \u00d710",
@@ -4121,7 +4332,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune scimitar",
@@ -4138,7 +4350,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Rune spear",
@@ -4155,7 +4368,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune hasta",
@@ -4172,7 +4386,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune arrowtips \u00d715",
@@ -4189,7 +4404,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune crossbow limbs",
@@ -4206,7 +4422,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune longsword",
@@ -4223,7 +4440,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Rune javelin heads \u00d75",
@@ -4240,7 +4458,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune full helm",
@@ -4257,7 +4476,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Rune throwing knives \u00d75",
@@ -4274,7 +4494,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Rune sq shield",
@@ -4291,7 +4512,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Rune warhammer",
@@ -4308,7 +4530,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 225
   },
   {
     "name": "Rune battleaxe",
@@ -4325,7 +4548,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 225
   },
   {
     "name": "Rune chainbody",
@@ -4342,7 +4566,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 225
   },
   {
     "name": "Rune kiteshield",
@@ -4359,7 +4584,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 225
   },
   {
     "name": "Rune claws",
@@ -4376,7 +4602,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Rune 2h sword",
@@ -4393,7 +4620,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 225
   },
   {
     "name": "Rune platelegs",
@@ -4410,7 +4638,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 225
   },
   {
     "name": "Rune plateskirt",
@@ -4427,7 +4656,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 225
   },
   {
     "name": "Rune platebody",
@@ -4444,7 +4674,8 @@ const RECIPES_DATA = [
         "name": "Runite bar",
         "qty": 5
       }
-    ]
+    ],
+    "xp": 375
   },
   {
     "name": "Opal",
@@ -4461,7 +4692,8 @@ const RECIPES_DATA = [
         "name": "Uncut opal",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 15
   },
   {
     "name": "Jade",
@@ -4478,7 +4710,8 @@ const RECIPES_DATA = [
         "name": "Uncut jade",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 20
   },
   {
     "name": "Red topaz",
@@ -4495,7 +4728,8 @@ const RECIPES_DATA = [
         "name": "Uncut red topaz",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Sapphire",
@@ -4512,7 +4746,8 @@ const RECIPES_DATA = [
         "name": "Uncut sapphire",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Emerald",
@@ -4529,7 +4764,8 @@ const RECIPES_DATA = [
         "name": "Uncut emerald",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 67.5
   },
   {
     "name": "Ruby",
@@ -4546,7 +4782,8 @@ const RECIPES_DATA = [
         "name": "Uncut ruby",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 85
   },
   {
     "name": "Diamond",
@@ -4563,7 +4800,8 @@ const RECIPES_DATA = [
         "name": "Uncut diamond",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 107.5
   },
   {
     "name": "Dragonstone",
@@ -4580,7 +4818,8 @@ const RECIPES_DATA = [
         "name": "Uncut dragonstone",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 137.5
   },
   {
     "name": "Onyx",
@@ -4597,7 +4836,8 @@ const RECIPES_DATA = [
         "name": "Uncut onyx",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 167.5
   },
   {
     "name": "Zenyte",
@@ -4614,7 +4854,8 @@ const RECIPES_DATA = [
         "name": "Uncut zenyte",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 200
   },
   {
     "name": "Gold ring",
@@ -4631,7 +4872,8 @@ const RECIPES_DATA = [
         "name": "Gold bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 15
   },
   {
     "name": "Gold necklace",
@@ -4648,7 +4890,8 @@ const RECIPES_DATA = [
         "name": "Gold bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 20
   },
   {
     "name": "Gold amulet (u)",
@@ -4665,7 +4908,8 @@ const RECIPES_DATA = [
         "name": "Gold bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 30
   },
   {
     "name": "Gold amulet",
@@ -4687,7 +4931,8 @@ const RECIPES_DATA = [
         "name": "Ball of wool",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 30
   },
   {
     "name": "Sapphire ring",
@@ -4709,7 +4954,8 @@ const RECIPES_DATA = [
         "name": "Sapphire",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 40
   },
   {
     "name": "Sapphire necklace",
@@ -4731,7 +4977,8 @@ const RECIPES_DATA = [
         "name": "Sapphire",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 55
   },
   {
     "name": "Sapphire amulet (u)",
@@ -4753,7 +5000,8 @@ const RECIPES_DATA = [
         "name": "Sapphire",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 65
   },
   {
     "name": "Sapphire amulet",
@@ -4775,7 +5023,8 @@ const RECIPES_DATA = [
         "name": "Ball of wool",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 65
   },
   {
     "name": "Emerald ring",
@@ -4797,7 +5046,8 @@ const RECIPES_DATA = [
         "name": "Emerald",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 55
   },
   {
     "name": "Emerald necklace",
@@ -4819,7 +5069,8 @@ const RECIPES_DATA = [
         "name": "Emerald",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 60
   },
   {
     "name": "Emerald amulet (u)",
@@ -4841,7 +5092,8 @@ const RECIPES_DATA = [
         "name": "Emerald",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 70
   },
   {
     "name": "Emerald amulet",
@@ -4863,7 +5115,8 @@ const RECIPES_DATA = [
         "name": "Ball of wool",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 70
   },
   {
     "name": "Ruby ring",
@@ -4885,7 +5138,8 @@ const RECIPES_DATA = [
         "name": "Ruby",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 70
   },
   {
     "name": "Ruby necklace",
@@ -4907,7 +5161,8 @@ const RECIPES_DATA = [
         "name": "Ruby",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Diamond ring",
@@ -4929,7 +5184,8 @@ const RECIPES_DATA = [
         "name": "Diamond",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 85
   },
   {
     "name": "Ruby amulet (u)",
@@ -4951,7 +5207,8 @@ const RECIPES_DATA = [
         "name": "Ruby",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 85
   },
   {
     "name": "Ruby amulet",
@@ -4973,7 +5230,8 @@ const RECIPES_DATA = [
         "name": "Ball of wool",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 85
   },
   {
     "name": "Diamond necklace",
@@ -4995,7 +5253,8 @@ const RECIPES_DATA = [
         "name": "Diamond",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 90
   },
   {
     "name": "Dragonstone ring",
@@ -5017,7 +5276,8 @@ const RECIPES_DATA = [
         "name": "Dragonstone",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Diamond amulet (u)",
@@ -5039,7 +5299,8 @@ const RECIPES_DATA = [
         "name": "Diamond",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Diamond amulet",
@@ -5061,7 +5322,8 @@ const RECIPES_DATA = [
         "name": "Ball of wool",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Dragon necklace",
@@ -5083,7 +5345,8 @@ const RECIPES_DATA = [
         "name": "Dragonstone",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 105
   },
   {
     "name": "Dragonstone amulet (u)",
@@ -5105,7 +5368,8 @@ const RECIPES_DATA = [
         "name": "Dragonstone",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Dragonstone amulet",
@@ -5127,7 +5391,8 @@ const RECIPES_DATA = [
         "name": "Ball of wool",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Onyx ring",
@@ -5149,7 +5414,8 @@ const RECIPES_DATA = [
         "name": "Onyx",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 115
   },
   {
     "name": "Onyx necklace",
@@ -5171,7 +5437,8 @@ const RECIPES_DATA = [
         "name": "Onyx",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 120
   },
   {
     "name": "Onyx amulet (u)",
@@ -5193,7 +5460,8 @@ const RECIPES_DATA = [
         "name": "Onyx",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 165
   },
   {
     "name": "Onyx amulet",
@@ -5215,7 +5483,8 @@ const RECIPES_DATA = [
         "name": "Ball of wool",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 165
   },
   {
     "name": "Zenyte ring",
@@ -5237,7 +5506,8 @@ const RECIPES_DATA = [
         "name": "Zenyte",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Zenyte necklace",
@@ -5259,7 +5529,8 @@ const RECIPES_DATA = [
         "name": "Zenyte",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 165
   },
   {
     "name": "Zenyte amulet (u)",
@@ -5281,7 +5552,8 @@ const RECIPES_DATA = [
         "name": "Zenyte",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 200
   },
   {
     "name": "Zenyte amulet",
@@ -5303,7 +5575,8 @@ const RECIPES_DATA = [
         "name": "Ball of wool",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 200
   },
   {
     "name": "Holy symbol (unstrung)",
@@ -5320,7 +5593,8 @@ const RECIPES_DATA = [
         "name": "Silver bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Unholy symbol (unstrung)",
@@ -5337,7 +5611,8 @@ const RECIPES_DATA = [
         "name": "Silver bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Silver sickle",
@@ -5354,7 +5629,8 @@ const RECIPES_DATA = [
         "name": "Silver bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Tiara",
@@ -5371,7 +5647,8 @@ const RECIPES_DATA = [
         "name": "Silver bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 52.5
   },
   {
     "name": "Silver bolts (unf) \u00d710",
@@ -5388,7 +5665,8 @@ const RECIPES_DATA = [
         "name": "Silver bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Leather gloves",
@@ -5405,7 +5683,8 @@ const RECIPES_DATA = [
         "name": "Leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 13.8
   },
   {
     "name": "Leather boots",
@@ -5422,7 +5701,8 @@ const RECIPES_DATA = [
         "name": "Leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 16.3
   },
   {
     "name": "Leather cowl",
@@ -5439,7 +5719,8 @@ const RECIPES_DATA = [
         "name": "Leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 18.5
   },
   {
     "name": "Leather vambraces",
@@ -5456,7 +5737,8 @@ const RECIPES_DATA = [
         "name": "Leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 22
   },
   {
     "name": "Leather body",
@@ -5473,7 +5755,8 @@ const RECIPES_DATA = [
         "name": "Leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Leather chaps",
@@ -5490,7 +5773,8 @@ const RECIPES_DATA = [
         "name": "Leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 27
   },
   {
     "name": "Hard leather body",
@@ -5507,7 +5791,8 @@ const RECIPES_DATA = [
         "name": "Hard leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 35
   },
   {
     "name": "Coif",
@@ -5524,7 +5809,8 @@ const RECIPES_DATA = [
         "name": "Leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 37
   },
   {
     "name": "Studded body",
@@ -5546,7 +5832,8 @@ const RECIPES_DATA = [
         "name": "Iron studs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 40
   },
   {
     "name": "Studded chaps",
@@ -5568,7 +5855,8 @@ const RECIPES_DATA = [
         "name": "Iron studs",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 42
   },
   {
     "name": "Green d'hide vambraces",
@@ -5585,7 +5873,8 @@ const RECIPES_DATA = [
         "name": "Green dragon leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 62
   },
   {
     "name": "Green d'hide chaps",
@@ -5602,7 +5891,8 @@ const RECIPES_DATA = [
         "name": "Green dragon leather",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 124
   },
   {
     "name": "Green d'hide body",
@@ -5619,7 +5909,8 @@ const RECIPES_DATA = [
         "name": "Green dragon leather",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 186
   },
   {
     "name": "Green d'hide shield",
@@ -5636,7 +5927,8 @@ const RECIPES_DATA = [
         "name": "Green dragon leather",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 124
   },
   {
     "name": "Blue d'hide vambraces",
@@ -5653,7 +5945,8 @@ const RECIPES_DATA = [
         "name": "Blue dragon leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 70
   },
   {
     "name": "Blue d'hide chaps",
@@ -5670,7 +5963,8 @@ const RECIPES_DATA = [
         "name": "Blue dragon leather",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 140
   },
   {
     "name": "Blue d'hide body",
@@ -5687,7 +5981,8 @@ const RECIPES_DATA = [
         "name": "Blue dragon leather",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 210
   },
   {
     "name": "Blue d'hide shield",
@@ -5704,7 +5999,8 @@ const RECIPES_DATA = [
         "name": "Blue dragon leather",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 140
   },
   {
     "name": "Red d'hide vambraces",
@@ -5721,7 +6017,8 @@ const RECIPES_DATA = [
         "name": "Red dragon leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 78
   },
   {
     "name": "Red d'hide chaps",
@@ -5738,7 +6035,8 @@ const RECIPES_DATA = [
         "name": "Red dragon leather",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 156
   },
   {
     "name": "Red d'hide body",
@@ -5755,7 +6053,8 @@ const RECIPES_DATA = [
         "name": "Red dragon leather",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 234
   },
   {
     "name": "Red d'hide shield",
@@ -5772,7 +6071,8 @@ const RECIPES_DATA = [
         "name": "Red dragon leather",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 156
   },
   {
     "name": "Black d'hide vambraces",
@@ -5789,7 +6089,8 @@ const RECIPES_DATA = [
         "name": "Black dragon leather",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 86
   },
   {
     "name": "Black d'hide chaps",
@@ -5806,7 +6107,8 @@ const RECIPES_DATA = [
         "name": "Black dragon leather",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 172
   },
   {
     "name": "Black d'hide body",
@@ -5823,7 +6125,8 @@ const RECIPES_DATA = [
         "name": "Black dragon leather",
         "qty": 3
       }
-    ]
+    ],
+    "xp": 258
   },
   {
     "name": "Black d'hide shield",
@@ -5840,7 +6143,8 @@ const RECIPES_DATA = [
         "name": "Black dragon leather",
         "qty": 2
       }
-    ]
+    ],
+    "xp": 172
   },
   {
     "name": "Beer glass",
@@ -5857,7 +6161,8 @@ const RECIPES_DATA = [
         "name": "Molten glass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 17.5
   },
   {
     "name": "Empty candle lantern",
@@ -5874,7 +6179,8 @@ const RECIPES_DATA = [
         "name": "Molten glass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 19
   },
   {
     "name": "Empty oil lamp",
@@ -5891,7 +6197,8 @@ const RECIPES_DATA = [
         "name": "Molten glass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Vial",
@@ -5908,7 +6215,8 @@ const RECIPES_DATA = [
         "name": "Molten glass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 35
   },
   {
     "name": "Fishbowl",
@@ -5925,7 +6233,8 @@ const RECIPES_DATA = [
         "name": "Molten glass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 42.5
   },
   {
     "name": "Unpowered staff orb",
@@ -5942,7 +6251,8 @@ const RECIPES_DATA = [
         "name": "Molten glass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 52.5
   },
   {
     "name": "Lantern lens",
@@ -5959,7 +6269,8 @@ const RECIPES_DATA = [
         "name": "Molten glass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 55
   },
   {
     "name": "Dorgeshuun light orb",
@@ -5976,7 +6287,8 @@ const RECIPES_DATA = [
         "name": "Molten glass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 104
   },
   {
     "name": "Water battlestaff",
@@ -5998,7 +6310,8 @@ const RECIPES_DATA = [
         "name": "Water orb",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Earth battlestaff",
@@ -6020,7 +6333,8 @@ const RECIPES_DATA = [
         "name": "Earth orb",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 112.5
   },
   {
     "name": "Fire battlestaff",
@@ -6042,7 +6356,8 @@ const RECIPES_DATA = [
         "name": "Fire orb",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 125
   },
   {
     "name": "Air battlestaff",
@@ -6064,7 +6379,8 @@ const RECIPES_DATA = [
         "name": "Air orb",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 137.5
   },
   {
     "name": "Shrimp",
@@ -6081,7 +6397,8 @@ const RECIPES_DATA = [
         "name": "Raw shrimps",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 30
   },
   {
     "name": "Sardine",
@@ -6098,7 +6415,8 @@ const RECIPES_DATA = [
         "name": "Raw sardine",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 40
   },
   {
     "name": "Anchovies",
@@ -6115,7 +6433,8 @@ const RECIPES_DATA = [
         "name": "Raw anchovies",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 30
   },
   {
     "name": "Herring",
@@ -6132,7 +6451,8 @@ const RECIPES_DATA = [
         "name": "Raw herring",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 50
   },
   {
     "name": "Mackerel",
@@ -6149,7 +6469,8 @@ const RECIPES_DATA = [
         "name": "Raw mackerel",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 60
   },
   {
     "name": "Trout",
@@ -6166,7 +6487,8 @@ const RECIPES_DATA = [
         "name": "Raw trout",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 70
   },
   {
     "name": "Cod",
@@ -6183,7 +6505,8 @@ const RECIPES_DATA = [
         "name": "Raw cod",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 75
   },
   {
     "name": "Pike",
@@ -6200,7 +6523,8 @@ const RECIPES_DATA = [
         "name": "Raw pike",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 80
   },
   {
     "name": "Salmon",
@@ -6217,7 +6541,8 @@ const RECIPES_DATA = [
         "name": "Raw salmon",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 90
   },
   {
     "name": "Tuna",
@@ -6234,7 +6559,8 @@ const RECIPES_DATA = [
         "name": "Raw tuna",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 100
   },
   {
     "name": "Karambwan",
@@ -6251,7 +6577,8 @@ const RECIPES_DATA = [
         "name": "Raw karambwan",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 190
   },
   {
     "name": "Jug of wine",
@@ -6273,7 +6600,8 @@ const RECIPES_DATA = [
         "name": "Jug of water",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 200
   },
   {
     "name": "Lobster",
@@ -6290,7 +6618,8 @@ const RECIPES_DATA = [
         "name": "Raw lobster",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 120
   },
   {
     "name": "Bass",
@@ -6307,7 +6636,8 @@ const RECIPES_DATA = [
         "name": "Raw bass",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 130
   },
   {
     "name": "Swordfish",
@@ -6324,7 +6654,8 @@ const RECIPES_DATA = [
         "name": "Raw swordfish",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 140
   },
   {
     "name": "Monkfish",
@@ -6341,7 +6672,8 @@ const RECIPES_DATA = [
         "name": "Raw monkfish",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 150
   },
   {
     "name": "Shark",
@@ -6358,7 +6690,8 @@ const RECIPES_DATA = [
         "name": "Raw shark",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 210
   },
   {
     "name": "Sea turtle",
@@ -6375,7 +6708,8 @@ const RECIPES_DATA = [
         "name": "Raw sea turtle",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 211.3
   },
   {
     "name": "Anglerfish",
@@ -6392,7 +6726,8 @@ const RECIPES_DATA = [
         "name": "Raw anglerfish",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 230
   },
   {
     "name": "Dark crab",
@@ -6409,7 +6744,8 @@ const RECIPES_DATA = [
         "name": "Raw dark crab",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 215
   },
   {
     "name": "Manta ray",
@@ -6426,7 +6762,8 @@ const RECIPES_DATA = [
         "name": "Raw manta ray",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 216.3
   },
   {
     "name": "Redberry pie",
@@ -6443,7 +6780,8 @@ const RECIPES_DATA = [
         "name": "Uncooked berry pie",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 78
   },
   {
     "name": "Meat pie",
@@ -6460,7 +6798,8 @@ const RECIPES_DATA = [
         "name": "Uncooked meat pie",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 110
   },
   {
     "name": "Mud pie",
@@ -6477,7 +6816,8 @@ const RECIPES_DATA = [
         "name": "Raw mud pie",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 128
   },
   {
     "name": "Apple pie",
@@ -6494,7 +6834,8 @@ const RECIPES_DATA = [
         "name": "Uncooked apple pie",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 130
   },
   {
     "name": "Garden pie",
@@ -6511,7 +6852,8 @@ const RECIPES_DATA = [
         "name": "Raw garden pie",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 138
   },
   {
     "name": "Fish pie",
@@ -6528,7 +6870,8 @@ const RECIPES_DATA = [
         "name": "Raw fish pie",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 164
   },
   {
     "name": "Botanical pie",
@@ -6545,7 +6888,8 @@ const RECIPES_DATA = [
         "name": "Uncooked botanical pie",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 180
   },
   {
     "name": "Wild pie",
@@ -6562,7 +6906,8 @@ const RECIPES_DATA = [
         "name": "Raw wild pie",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 240
   },
   {
     "name": "Summer pie",
@@ -6579,7 +6924,8 @@ const RECIPES_DATA = [
         "name": "Raw summer pie",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 260
   },
   {
     "name": "Plain pizza",
@@ -6596,7 +6942,8 @@ const RECIPES_DATA = [
         "name": "Uncooked pizza",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 143
   },
   {
     "name": "Air runes \u00d79",
@@ -6613,7 +6960,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 5
   },
   {
     "name": "Mind runes \u00d79",
@@ -6630,7 +6978,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 5.5
   },
   {
     "name": "Water runes \u00d78",
@@ -6647,7 +6996,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 6
   },
   {
     "name": "Earth runes \u00d77",
@@ -6664,7 +7014,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 6.5
   },
   {
     "name": "Fire runes \u00d77",
@@ -6681,7 +7032,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 7
   },
   {
     "name": "Body runes \u00d78",
@@ -6698,7 +7050,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 7.5
   },
   {
     "name": "Cosmic runes \u00d72",
@@ -6715,7 +7068,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 8
   },
   {
     "name": "Chaos runes \u00d72",
@@ -6732,7 +7086,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 8.5
   },
   {
     "name": "Nature runes \u00d72",
@@ -6749,7 +7104,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 9
   },
   {
     "name": "Law runes",
@@ -6766,7 +7122,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 9.5
   },
   {
     "name": "Death runes",
@@ -6783,7 +7140,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 10
   },
   {
     "name": "Blood runes",
@@ -6800,7 +7158,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 23.8
   },
   {
     "name": "Soul runes",
@@ -6817,7 +7176,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 29.7
   },
   {
     "name": "Wrath runes",
@@ -6834,7 +7194,8 @@ const RECIPES_DATA = [
         "name": "Pure essence",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 8
   },
   {
     "name": "Gold bracelet",
@@ -6851,7 +7212,8 @@ const RECIPES_DATA = [
         "name": "Gold bar",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Sapphire bracelet",
@@ -6873,7 +7235,8 @@ const RECIPES_DATA = [
         "name": "Sapphire",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 60
   },
   {
     "name": "Emerald bracelet",
@@ -6895,7 +7258,8 @@ const RECIPES_DATA = [
         "name": "Emerald",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 65
   },
   {
     "name": "Ruby bracelet",
@@ -6917,7 +7281,8 @@ const RECIPES_DATA = [
         "name": "Ruby",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 80
   },
   {
     "name": "Diamond bracelet",
@@ -6939,7 +7304,8 @@ const RECIPES_DATA = [
         "name": "Diamond",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 95
   },
   {
     "name": "Dragonstone bracelet",
@@ -6961,7 +7327,8 @@ const RECIPES_DATA = [
         "name": "Dragonstone",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 110
   },
   {
     "name": "Onyx bracelet",
@@ -6983,7 +7350,8 @@ const RECIPES_DATA = [
         "name": "Onyx",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 125
   },
   {
     "name": "Zenyte bracelet",
@@ -7005,7 +7373,8 @@ const RECIPES_DATA = [
         "name": "Zenyte",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 180
   },
   {
     "name": "Opal ring",
@@ -7027,7 +7396,8 @@ const RECIPES_DATA = [
         "name": "Opal",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 10
   },
   {
     "name": "Opal necklace",
@@ -7049,7 +7419,8 @@ const RECIPES_DATA = [
         "name": "Opal",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 35
   },
   {
     "name": "Opal bracelet",
@@ -7071,7 +7442,8 @@ const RECIPES_DATA = [
         "name": "Opal",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 45
   },
   {
     "name": "Opal amulet (u)",
@@ -7093,7 +7465,8 @@ const RECIPES_DATA = [
         "name": "Opal",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 55
   },
   {
     "name": "Jade ring",
@@ -7115,7 +7488,8 @@ const RECIPES_DATA = [
         "name": "Jade",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 13
   },
   {
     "name": "Jade necklace",
@@ -7137,7 +7511,8 @@ const RECIPES_DATA = [
         "name": "Jade",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 25
   },
   {
     "name": "Jade bracelet",
@@ -7159,7 +7534,8 @@ const RECIPES_DATA = [
         "name": "Jade",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 30
   },
   {
     "name": "Jade amulet (u)",
@@ -7181,7 +7557,8 @@ const RECIPES_DATA = [
         "name": "Jade",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 30
   },
   {
     "name": "Topaz ring",
@@ -7203,7 +7580,8 @@ const RECIPES_DATA = [
         "name": "Red topaz",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 16
   },
   {
     "name": "Topaz necklace",
@@ -7225,7 +7603,8 @@ const RECIPES_DATA = [
         "name": "Red topaz",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 35
   },
   {
     "name": "Topaz bracelet",
@@ -7247,7 +7626,8 @@ const RECIPES_DATA = [
         "name": "Red topaz",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 45
   },
   {
     "name": "Topaz amulet (u)",
@@ -7269,7 +7649,8 @@ const RECIPES_DATA = [
         "name": "Red topaz",
         "qty": 1
       }
-    ]
+    ],
+    "xp": 45
   }
 ]
 </script>
@@ -7313,7 +7694,7 @@ function setStatus(text, live = false) {
 }
 
 async function init() {
-  document.getElementById('tbody').innerHTML = `<tr><td colspan="5" class="loading-row">Loading…</td></tr>`;
+  document.getElementById('tbody').innerHTML = `<tr><td colspan="7" class="loading-row">Loading…</td></tr>`;
   try {
     setStatus('Fetching prices…');
     const priceRes = await fetch('https://prices.runescape.wiki/api/v1/osrs/latest');
@@ -7332,7 +7713,7 @@ async function init() {
   } catch(e) {
     setStatus(`Load failed: ${e.message}`);
     document.getElementById('tbody').innerHTML =
-      `<tr><td colspan="5" class="loading-row" style="color:var(--red)">${e.message}</td></tr>`;
+      `<tr><td colspan="7" class="loading-row" style="color:var(--red)">${e.message}</td></tr>`;
   }
 }
 
@@ -7358,7 +7739,9 @@ function computeAll() {
       revenue -= tax;
     }
     if (costOk && revenue != null) profit = Math.round(revenue - cost);
-    return { ...r, cost: costOk ? Math.round(cost) : null, revenue: revenue != null ? Math.round(revenue) : null, profit };
+    const xp = r.xp || null;
+    const gpPerXp = (profit != null && xp) ? Math.round((profit / xp) * 100) / 100 : null;
+    return { ...r, cost: costOk ? Math.round(cost) : null, revenue: revenue != null ? Math.round(revenue) : null, profit, xp, gpPerXp };
   });
 }
 
@@ -7401,7 +7784,7 @@ function render() {
 
   document.getElementById('count-badge').textContent = rows.length;
 
-  ['name','skill','cost','revenue','profit'].forEach(k => {
+  ['name','skill','cost','revenue','profit','xp','gpPerXp'].forEach(k => {
     const el = document.getElementById('arr-' + k);
     if (!el) return;
     el.textContent = sortKey === k ? (sortAsc ? '▲' : '▼') : '';
@@ -7411,7 +7794,7 @@ function render() {
   });
 
   if (!rows.length) {
-    document.getElementById('tbody').innerHTML = `<tr><td colspan="5" class="no-results">No recipes match your filters.</td></tr>`;
+    document.getElementById('tbody').innerHTML = `<tr><td colspan="7" class="no-results">No recipes match your filters.</td></tr>`;
     return;
   }
 
@@ -7430,6 +7813,16 @@ function render() {
     } else {
       profitHtml = `<span class="profit-value profit-neg">${fmt(r.profit)}<span class="gp">gp</span></span>`;
     }
+    let gpPerXpHtml;
+    if (r.gpPerXp == null) {
+      gpPerXpHtml = '<span class="profit-value profit-zero">—</span>';
+    } else if (r.gpPerXp > 0) {
+      gpPerXpHtml = '<span class="profit-value profit-pos">+' + r.gpPerXp.toFixed(1) + '<span class="gp">gp/xp</span></span>';
+    } else if (r.gpPerXp < 0) {
+      gpPerXpHtml = '<span class="profit-value profit-neg">' + r.gpPerXp.toFixed(1) + '<span class="gp">gp/xp</span></span>';
+    } else {
+      gpPerXpHtml = '<span class="profit-value profit-zero">0<span class="gp">gp/xp</span></span>';
+    }
     const membersTag = r.members
       ? `<span class="members-tag">P2P</span>`
       : `<span class="f2p-tag">F2P</span>`;
@@ -7442,6 +7835,8 @@ function render() {
       <td class="price-cell col-hide">${r.cost != null ? fmt(r.cost) + '<span class="gp">gp</span>' : '—'}</td>
       <td class="price-cell col-hide">${r.revenue != null ? fmt(r.revenue) + '<span class="gp">gp</span>' : '—'}</td>
       <td class="profit-cell">${profitHtml}</td>
+      <td class="price-cell col-hide">${r.xp != null ? r.xp.toLocaleString() + '<span class="gp">xp</span>' : '—'}</td>
+      <td class="price-cell">${gpPerXpHtml}</td>
     </tr>`;
   }).join('');
 
@@ -7465,6 +7860,11 @@ function updateStats() {
     const best = profitable.reduce((a, b) => a.profit > b.profit ? a : b);
     document.getElementById('s-best').textContent = fmt(best.profit) + ' gp';
     document.getElementById('s-bestname').textContent = best.name;
+    const bestGpXp = profitable.filter(r => r.gpPerXp != null).reduce((a, b) => (a.gpPerXp > b.gpPerXp ? a : b), {gpPerXp: -Infinity});
+    if (bestGpXp.gpPerXp > -Infinity) {
+      document.getElementById('s-bestgpxp').textContent = bestGpXp.gpPerXp.toFixed(1) + ' gp/xp (' + bestGpXp.name + ')';
+      document.getElementById('s-bestgpxp').style.fontSize = '13px';
+    }
   }
 }
 
